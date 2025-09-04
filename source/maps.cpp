@@ -2,6 +2,9 @@
 
 Maps::Maps()
 {
+	// Can't believe I forgot this line.
+	srand(time(0));
+
 	// Textbuffer should only contain one character (the value of the mine) and it gets cleared each time it gets to another mine
 	// from snprintf issues later it seems one character will be in the range 2 to 11 bytes.
 	textBuffer = C2D_TextBufNew(32);

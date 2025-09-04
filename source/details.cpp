@@ -26,7 +26,7 @@ std::string Details::intAsTime(int _timeSeconds)
 	int seconds = 0;
 	
 	hours = (int)(_timeSeconds / 3600);
-	minutes = hours / 60;
+	minutes = (int)(_timeSeconds / 60);
 	seconds = _timeSeconds % 60;
 
 	return timeFormat(hours) + ":" + timeFormat(minutes) + ":" + timeFormat(seconds);

@@ -8,9 +8,10 @@ class Player
 public:
 	Player();
 	// void update(Vector2i _mapSize);
-	bool update(int _tileSize);
+	void update(int _tileSize);
 	// void draw(int _tileSize);
 	bool tilePlaced;
-	bool touchDown;
 	Vector2i position;
+private:
+	Vector2i lastPosition;
 };

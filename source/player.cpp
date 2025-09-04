@@ -3,11 +3,12 @@
 Player::Player()
 {
 	// init position
-	position = { -1, -1 };
+	position = { 0, 0 };
+	lastPosition = { -1, -1 };
 	tilePlaced = false;
 }
 
-bool Player::update(int tileSize)
+void Player::update(int tileSize)
 {
 	// u32 kDown = hidKeysDown();
 
@@ -23,24 +24,35 @@ bool Player::update(int tileSize)
 
 	touchPosition touch;
 	hidTouchRead(&touch);
-	
-	printf("%i, %i\n", touch.px, touch.py);
 
 	if (touch.px == 0.f && touch.py == 0.f)
 	{
 		tilePlaced = false;
-		return false;
+		lastPosition = { -1, -1 };
+		return;
 	}
 
-	if (touch.px != 0.f && touch.py != 0.f && !tilePlaced)
+	if (lastPosition.x == -1 && lastPosition.y == -1)
 	{
-		position.x = touch.px / tileSize;
-		position.y = touch.py / tileSize;
+		lastPosition.x = touch.px;
+		lastPosition.x = touch.py;
+	}
+	
+	if (touch.px != lastPosition.x || touch.py != lastPosition.y)
+	{
+		Vector2i mapPosition = { touch.px / tileSize, touch.py / tileSize };
+
+		lastPosition.x = touch.px;
+		lastPosition.y = touch.py;
+		position = mapPosition;
 		tilePlaced = true;
-		return true;
+	}
+	else
+	{
+		tilePlaced = false;
 	}
 
-	return false;
+	printf("Touch: {%i, %i, Position: {%i, %i}, lastPosition: {%i, %i} \n", touch.px, touch.py, position.x, position.y, lastPosition.x, lastPosition.y);
 }
 
 // void Player::draw(int _tileSize)

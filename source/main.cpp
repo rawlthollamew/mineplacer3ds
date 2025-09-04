@@ -17,7 +17,6 @@ int main(int argc, char* argv[])
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	romfsInit();
 	C2D_Prepare();
-	consoleInit(GFX_TOP, NULL);
 
 	C3D_RenderTarget* top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	C3D_RenderTarget* bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
@@ -37,12 +36,13 @@ int main(int argc, char* argv[])
 
 		// player.update(maps.dimentions);
 		// if (player.tilePlaced) maps.placeMine(player.position);
-		if (!player.update(maps.tileSize)) maps.placeMine(player.position);
+		player.update(maps.tileSize);
+		if (player.tilePlaced) maps.placeMine(player.position);
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-			// C2D_TargetClear(top, clrBlack);
-			// C2D_SceneBegin(top);
-			// details.draw();
+			C2D_TargetClear(top, clrBlack);
+			C2D_SceneBegin(top);
+			details.draw();
 			
 			C2D_TargetClear(bottom, clrBlack);
 			C2D_SceneBegin(bottom);
