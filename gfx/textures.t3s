@@ -1,0 +1,5 @@
+--atlas -f rgb8888 -z auto
+tile.png
+revealed.png
+error.png
+flag.png
