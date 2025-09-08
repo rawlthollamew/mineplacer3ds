@@ -21,15 +21,19 @@ enum TileColors
 class Maps
 {
 public:
-	Maps();
+	Maps(C2D_SpriteSheet& _sheet);
 
 	int tileSize = 20;
 	int mineCount = 50;
+	int minesPlaced = 0;
 	Vector2i dimentions = { bottomScreen.x / tileSize, bottomScreen.y / tileSize };
 
 	void generate();
 	void draw();
 	void placeMine(Vector2i _position);
+
+	bool mapCompleted();
+	bool getPlacedMinesCount();
 private:
 	std::vector<std::vector<int>> generatedMap;
 	std::vector<std::vector<bool>> mineMap;
@@ -37,7 +41,6 @@ private:
 
 	C2D_TextBuf textBuffer;
 	
-	C2D_SpriteSheet sheet;
 	C2D_Sprite tileSprite;
 	C2D_Sprite revealedSprite;
 	C2D_Sprite errorSprite;

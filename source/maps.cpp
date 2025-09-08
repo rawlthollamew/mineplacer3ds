@@ -1,25 +1,17 @@
 #include "maps.h"
 
-Maps::Maps()
+Maps::Maps(C2D_SpriteSheet& _sheet)
 {
-	// Can't believe I forgot this line.
 	srand(time(0));
-
-	// Textbuffer should only contain one character (the value of the mine) and it gets cleared each time it gets to another mine
-	// from snprintf issues later it seems one character will be in the range 2 to 11 bytes.
-	textBuffer = C2D_TextBufNew(32);
-
-	mineMap.resize(dimentions.y, std::vector<bool>(dimentions.x));
-	playerMap.resize(dimentions.y, std::vector<bool>(dimentions.x));
-	generatedMap.resize(dimentions.y, std::vector<int>(dimentions.x));
+	
+	textBuffer = C2D_TextBufNew(4096);
 	
 	generate();
 
-	sheet = C2D_SpriteSheetLoad("romfs:/gfx/textures.t3x");
-	C2D_SpriteFromSheet(&tileSprite, sheet, 0);
-	C2D_SpriteFromSheet(&revealedSprite, sheet, 1);
-	C2D_SpriteFromSheet(&errorSprite, sheet, 2);
-	C2D_SpriteFromSheet(&flagSprite, sheet, 3);
+	C2D_SpriteFromSheet(&tileSprite, _sheet, 0);
+	C2D_SpriteFromSheet(&revealedSprite, _sheet, 1);
+	C2D_SpriteFromSheet(&errorSprite, _sheet, 2);
+	C2D_SpriteFromSheet(&flagSprite, _sheet, 3);
 }
 
 int Maps::surroundingMines(Vector2i _position)
@@ -48,7 +40,11 @@ int Maps::surroundingMines(Vector2i _position)
 void Maps::generate()
 {
 	int minesPlaced = 0;
-	
+
+	mineMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
+	playerMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
+	generatedMap.assign(dimentions.y, std::vector<int>(dimentions.x, 0));
+
 	while (minesPlaced < mineCount)
 	{
 		int x = rand() % dimentions.x;
@@ -89,8 +85,7 @@ void Maps::draw()
 			C2D_Sprite currentSprite;
 			
 			if (generatedMap[y][x] > 0) currentSprite = revealedSprite;
-			else if (generatedMap[y][x] == 0) currentSprite = tileSprite;
-			else if (generatedMap[y][x] < 0) currentSprite = errorSprite;
+			else if (generatedMap[y][x] <= 0) currentSprite = tileSprite;
 			
 			C2D_SpriteSetCenter(&currentSprite, 0.f, 0.f);
 			C2D_SpriteSetPos(&currentSprite, x * tileSize, y * tileSize);
@@ -105,11 +100,19 @@ void Maps::draw()
 				C2D_DrawSprite(&flagSprite);
 			}
 			
-			if (generatedMap[y][x] > 0)
+			if (generatedMap[y][x] < 0)
+			{
+				C2D_SpriteSetCenter(&errorSprite, 0.f, 0.f);
+				C2D_SpriteSetPos(&errorSprite, x * tileSize, y * tileSize);
+				C2D_SpriteSetScale(&errorSprite, 1.f, 1.f);
+				C2D_DrawSprite(&errorSprite);
+
+			}
+			else if (generatedMap[y][x] > 0)
 			{	
 				if (playerMap[y][x])
 				{
-					Vector2i textPosition = { x * tileSize + (tileSize * 0.6f), y * tileSize + (tileSize * 0.4f) };
+					Vector2i textPosition = { (int)(x * tileSize + (tileSize * 0.6f)), (int)(y * tileSize + (tileSize * 0.4f)) };
 
 					snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
 					C2D_TextParse(&dynamicText, textBuffer, buf);
@@ -118,16 +121,14 @@ void Maps::draw()
 				}
 				else if (!playerMap[y][x])
 				{
-					Vector2i textPosition = { x * tileSize + (tileSize * 0.25f), y * tileSize + (tileSize * 0.1f) };
+					Vector2i textPosition = { (int)(x * tileSize + (tileSize * 0.25f)), (int)(y * tileSize + (tileSize * 0.1f)) };
 					
 					snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
 					C2D_TextParse(&dynamicText, textBuffer, buf);
 					C2D_TextOptimize(&dynamicText);
 					C2D_DrawText(&dynamicText, C2D_WithColor, textPosition.x, textPosition.y, 0.f, 0.75f, 0.75f, currentTileColor);
 				}
-
 			}
-			
 			
 			// if (mineMap[y][x]) C2D_DrawRectSolid(x * tileSize, y * tileSize, 0, tileSize, tileSize, C2D_Color32f(0.f,1.f,1.f,0.5f));
 		}
@@ -147,9 +148,34 @@ void Maps::placeMine(Vector2i _position)
 	{
 		Vector2i currentPosition = {_position.x + currentMove.x, _position.y + currentMove.y};
 
-		if (playerMap[_position.y][_position.x]) generatedMap[currentPosition.y][currentPosition.x] -= 1;
-		else if (!playerMap[_position.y][_position.x]) generatedMap[currentPosition.y][currentPosition.x] += 1;
+		if (currentPosition.x >= 0 && currentPosition.x < dimentions.x &&
+			currentPosition.y >= 0 && currentPosition.y < dimentions.y)
+		{
+			if (playerMap[_position.y][_position.x]) generatedMap[currentPosition.y][currentPosition.x] -= 1;
+			else if (!playerMap[_position.y][_position.x]) generatedMap[currentPosition.y][currentPosition.x] += 1;
+		}
+
 	}
+}
+
+bool Maps::mapCompleted()
+{
+	int count = 0;
+	int minesPlacedCount = 0;
+
+	for (int x = 0; x < dimentions.x; x++)
+	{
+		for (int y = 0; y < dimentions.y; y++)
+		{
+			count += generatedMap[y][x];
+			minesPlacedCount += playerMap[y][x];
+		}
+	}
+
+	minesPlaced = minesPlacedCount;
+
+    if (count == 0) return true;
+	else return false;
 }
 
 u32 Maps::getColor(TileColors _tileValue)

@@ -15,12 +15,25 @@
 class Details
 {
 public:
-	Details();
+	Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions);
 	~Details();
-	void draw();
+	void draw(int _minesPlaced);
+
+	bool timeStopped;
+	void stopTimer();
+	void resetTimer();
+
+	int mineCount;
+	Vector2i dimentions;
 private:
 	int startingTime;
+	int finalTime;
+
 	std::string intAsTime(int _timeSeconds);
 	std::string timeFormat(int _timeValue);
-	C2D_TextBuf textBuffer;
+	
+	C2D_TextBuf timeTextBuffer;
+	C2D_TextBuf minesTextBuffer;
+	C2D_Sprite timeSprite;
+	C2D_Sprite flagSprite;
 };
