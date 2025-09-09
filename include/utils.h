@@ -7,6 +7,18 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
+enum PngOrder
+{
+	tilePng,
+	revealedPng,
+	errorPng,
+	flagPng,
+	clockPng,
+	selectionPng,
+	newGamePng,
+	helpPng
+};
+
 struct Vector2f
 {
 	float x;

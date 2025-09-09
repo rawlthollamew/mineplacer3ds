@@ -9,8 +9,14 @@ Details::Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions)
 	
 	timeTextBuffer = C2D_TextBufNew(1 << 12); // 4096 (sick way of writing it)
 	minesTextBuffer = C2D_TextBufNew(1 << 12); // 4096 (sick way of writing it)
-	C2D_SpriteFromSheet(&flagSprite, _sheet, 3);
-	C2D_SpriteFromSheet(&timeSprite, _sheet, 4);
+	C2D_SpriteFromSheet(&flagSprite, _sheet, flagPng);
+	C2D_SpriteFromSheet(&timeSprite, _sheet, clockPng);
+
+	// mess
+	buttonsPosition = {
+		topScreen.x - (2 * (int)(flagSprite.image.subtex->width * 1.25)) - (int)(flagSprite.image.subtex->width * 0.25f),
+		topScreen.y - (int)(flagSprite.image.subtex->height * 1.25)
+	};
 }
 
 Details::~Details()
@@ -45,37 +51,40 @@ std::string Details::intAsTime(int _timeSeconds)
 
 void Details::draw(int _minesPlaced)
 {
-	C2D_TextBufClear(timeTextBuffer);
-	C2D_TextBufClear(minesTextBuffer);
-	C2D_Text timeText;
-	C2D_Text minesText;
+	//
+	// 1.
+	// rectangles behind the text and buttons
+	// and the sprites for the time and mines remaining.
+	//
 
 	// C2D_TextParse(&timeText, textBuffer, "000");
 	// float width = 0;
 	// float height = 0;
-
+	
 	// C2D_TextGetDimensions(&timeText, 1, 1, &width, &height);
-
-	// printf("%f, %f\n", width, height);
-	// // size of 3 digits is 51, 30
-	// // rounded it to 50, 30
-
+	
+	// printf("x=%f, y=%f\n", width, height);
+	// // x=51, y=30
+	// // rounded it to 50, 30 in the Vector2i digitsSize so i can do maths and whatnot with it.
+	// // this also means that one digit is 17 pixels (51 / 3).
+	
 	Vector2i detailsPosition = {0, topScreen.y - (int)(flagSprite.image.subtex->height * 1.5)};
 	Vector2i detailsSize = {topScreen.x, (int)(flagSprite.image.subtex->height * 1.5)};
 	int detailsPadding = (detailsSize.y - flagSprite.image.subtex->height) / 2.f;
 	
 	Vector2i digitsSize = { 50, 30 };
-	// 2 is the padding size inbetween the text and rectangle, with trials proving this is the best number
+	// 2 is the padding size inbetween the text and rectangle, not calcuated, but just tested and got this as the best result.
 	int digitsPadding = 2;
 	Vector2i digitsPosition = {(int)(flagSprite.image.subtex->width * 1.5f), detailsPosition.y};
-
+	
 	Vector2i minesPosition = {
 		detailsPosition.x + (detailsPadding * 3) + digitsSize.x + (flagSprite.image.subtex->width),
 		digitsPosition.y + detailsPadding
 	};
-
+	
 	Vector2i minesSize = {( 2 * digitsSize.x ) / 3, digitsSize.y};
-
+	
+	// infobox.
 	C2D_DrawRectSolid(
 		detailsPosition.x,
 		detailsPosition.y,
@@ -84,7 +93,7 @@ void Details::draw(int _minesPlaced)
 		detailsSize.y,
 		C2D_Color32f(1.f, 1.f, 1.f, 0.5f)
 	);
-
+	
 	// both digits positions
 	C2D_DrawRectSolid(
 		digitsPosition.x,
@@ -102,32 +111,42 @@ void Details::draw(int _minesPlaced)
 		minesSize.y,
 		C2D_Color32f(1.f, 1.f, 1.f, 0.25f)
 	);
-
+	
+	// time and mine icons
 	C2D_SpriteSetPos(
 		&timeSprite,
 		detailsPosition.x + detailsPadding,
 		detailsPosition.y + detailsPadding
 	);
-
 	C2D_SpriteSetPos(
 		&flagSprite,
 		minesPosition.x,
 		minesPosition.y
 	);
-
+	
 	C2D_DrawSprite(&flagSprite);
 	C2D_DrawSprite(&timeSprite);
 
+	//
+	// 2.
+	// text handler, prints out the mines remaining and time
+	//
+
 	// time text handler
+	C2D_TextBufClear(timeTextBuffer);
+	C2D_TextBufClear(minesTextBuffer);
+	C2D_Text timeText;
+	C2D_Text minesText;
+
 	int timeValue = (timeStopped) ? finalTime : (int)time(0) - startingTime;
 	std::string timeOutput = std::to_string(timeValue);
-
-	if (timeValue < 10) timeOutput = "00" + timeOutput;
-	else if (timeValue >= 10 && timeValue < 100) timeOutput = "0" + timeOutput;
-
+	
+	if (timeOutput.length() == 1) timeOutput = "00" + timeOutput;
+	else if (timeOutput.length() == 2) timeOutput = "0" + timeOutput;
+	
 	C2D_TextParse(&timeText, timeTextBuffer, timeOutput.c_str());
 	C2D_TextOptimize(&timeText);
-
+	
 	C2D_DrawText(
 		&timeText,
 		C2D_WithColor,
@@ -143,7 +162,10 @@ void Details::draw(int _minesPlaced)
 	int mineValue = mineCount - _minesPlaced;
 	std::string minesOutput = std::to_string(mineValue);
 	
-	if (mineValue < 10) minesOutput = "0" + minesOutput;
+	// works as long as mineCount > 100
+	// will need to look if there is a c2d_drawtext flag that will allow me to draw text backwards and underneath everything else
+	// then put like 5 zeros infront of all the times and mines.
+	if (minesOutput.length() == 1) minesOutput = "0" + minesOutput;
 
 	C2D_TextParse(&minesText, minesTextBuffer, minesOutput.c_str());
 	C2D_TextOptimize(&minesText);

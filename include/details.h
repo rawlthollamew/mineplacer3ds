@@ -7,10 +7,8 @@
 #include <vector>
 #include "utils.h"
 
-// time for this map
-// mines left
 // buttons
-// new map with options (mine count, width, height)
+// new map with options (mine count, width, height, walls)
 
 class Details
 {
@@ -25,6 +23,7 @@ public:
 
 	int mineCount;
 	Vector2i dimentions;
+	Vector2i buttonsPosition;
 private:
 	int startingTime;
 	int finalTime;

@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "maps.h"
 #include "details.h"
+#include "buttons.h"
 
 int main(int argc, char* argv[])
 {
@@ -25,9 +26,12 @@ int main(int argc, char* argv[])
 
 	Maps maps(sheet);
 	Details details(sheet, maps.mineCount, maps.dimentions);
+	ButtonHandler buttonHandler(sheet, details.buttonsPosition);
 
 	while (aptMainLoop())
 	{
+		if (maps.mapCompleted()) details.stopTimer();
+
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		
@@ -35,29 +39,37 @@ int main(int argc, char* argv[])
 		hidTouchRead(&touch);
 		
 		if (kDown & KEY_START) break;
-		else if (kDown & KEY_TOUCH)
+		else if (kDown & KEY_TOUCH) maps.placeMine({touch.px, touch.py});
+		else if (kDown & KEY_LEFT)
 		{
-			Vector2i mapPosition = {touch.px / maps.tileSize, touch.py / maps.tileSize};
-
-			if (mapPosition.x >= 0 && mapPosition.x < maps.dimentions.x &&
-				mapPosition.y >= 0 && mapPosition.y < maps.dimentions.y)
-			{
-				maps.placeMine(mapPosition);
-			}
+			buttonHandler.selection -= 1;
+			if (buttonHandler.selection < 0) buttonHandler.selection = 0;
+		}
+		else if (kDown & KEY_RIGHT)
+		{
+			buttonHandler.selection += 1;
+			if (buttonHandler.selection >= buttonHandler.buttonCount) buttonHandler.selection = buttonHandler.buttonCount - 1;
 		}
 		else if (kDown & KEY_A)
 		{
-			maps.generate();
-			details.resetTimer();
+			if (buttonHandler.selection == 0)
+			{
+				maps.generate();
+				details.resetTimer();
+			}
+			else if (buttonHandler.selection == 1)
+			{
+				;
+			}
 		}
 
-		if (maps.mapCompleted()) details.stopTimer();
 
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C2D_TargetClear(top, clrBlack);
 			C2D_SceneBegin(top);
 			details.draw(maps.minesPlaced);
+			buttonHandler.draw();
 			
 			C2D_TargetClear(bottom, clrBlack);
 			C2D_SceneBegin(bottom);
