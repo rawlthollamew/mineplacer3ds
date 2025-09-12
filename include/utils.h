@@ -14,9 +14,11 @@ enum PngOrder
 	errorPng,
 	flagPng,
 	clockPng,
-	selectionPng,
 	newGamePng,
-	helpPng
+	helpPng,
+	lbPng,
+	selectionLeftPng,
+	selectionRightPng
 };
 
 struct Vector2f

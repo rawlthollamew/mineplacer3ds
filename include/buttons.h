@@ -11,12 +11,18 @@
 class Button
 {
 public:
-	Button(Vector2i _position, C2D_Sprite _foreground, C2D_Sprite _background);
+	Button();
+	Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _text);
 	
+	u32 color;
 	Vector2i position;
-	C2D_Sprite background;
-	C2D_Sprite foreground;
+	Vector2f size;
+
+	// null as default.
+	C2D_Sprite sprite;
+	C2D_Text text;
 	
+	void initText(std::string _text);
 	void draw();
 };
 
@@ -26,11 +32,20 @@ class ButtonHandler
 public:
 	int buttonCount;
 	int selection;
-	C2D_Sprite selectionSprite;
 
-	std::vector<Button> buttons;
-	ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition);
+	C2D_Sprite selectionLeft;
+	C2D_Sprite selectionRight;
+
+	ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding);
 	void draw();
+	void setVector(bool _helpText);
 private:
+	int padding;
 	Vector2i drawPosition;
+
+	Button helpButton;
+	Button lbButton;
+	Button newGameButton;
+
+	std::vector<Button> activeButtons;
 };

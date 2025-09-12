@@ -25,13 +25,15 @@ int main(int argc, char* argv[])
 	C2D_SpriteSheet sheet = C2D_SpriteSheetLoad("romfs:/gfx/textures.t3x");
 
 	Maps maps(sheet);
-	Details details(sheet, maps.mineCount, maps.dimentions);
-	ButtonHandler buttonHandler(sheet, details.buttonsPosition);
+	Details details(sheet, maps.mineCount, maps.dimentions, 1);
+	ButtonHandler buttonHandler(sheet, details.getInfoPosition(), details.getInfoPadding());
 
+	buttonHandler.setVector(details.helpText);
+	
 	while (aptMainLoop())
 	{
 		if (maps.mapCompleted()) details.stopTimer();
-
+		
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		
@@ -59,16 +61,18 @@ int main(int argc, char* argv[])
 			}
 			else if (buttonHandler.selection == 1)
 			{
-				;
+				details.helpText = !details.helpText;
+				details.setTopText();
+				buttonHandler.setVector(details.helpText);
 			}
 		}
 
-
+		details.update(maps.minesPlaced);
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C2D_TargetClear(top, clrBlack);
 			C2D_SceneBegin(top);
-			details.draw(maps.minesPlaced);
+			details.draw();
 			buttonHandler.draw();
 			
 			C2D_TargetClear(bottom, clrBlack);
