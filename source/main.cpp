@@ -9,6 +9,8 @@
 #include "maps.h"
 #include "details.h"
 #include "buttons.h"
+#include "scores.h"
+#include "timer.h"
 
 int main(int argc, char* argv[])
 {
@@ -27,12 +29,26 @@ int main(int argc, char* argv[])
 	Maps maps(sheet);
 	Details details(sheet, maps.mineCount, maps.dimentions, 1);
 	ButtonHandler buttonHandler(sheet, details.getInfoPosition(), details.getInfoPadding());
+	Scores scores("sdmc://scores.txt");
+	details.textPanel.loadLeaderboardText(scores.lb);
+	Timer timer;
 
-	buttonHandler.setVector(details.helpText);
+	buttonHandler.setVector(details.textPanel.helpText);
+	bool submittedTime = false;
 	
 	while (aptMainLoop())
 	{
-		if (maps.mapCompleted()) details.stopTimer();
+		if (maps.mapCompleted())
+		{
+			timer.stop();
+
+			if (!submittedTime)
+			{
+				scores.insertScore(timer.getTime());
+				details.textPanel.loadLeaderboardText(scores.lb);
+				submittedTime = true;
+			}
+		}
 		
 		hidScanInput();
 		u32 kDown = hidKeysDown();
@@ -57,17 +73,21 @@ int main(int argc, char* argv[])
 			if (buttonHandler.selection == 0)
 			{
 				maps.generate();
-				details.resetTimer();
+				timer.reset();
+				submittedTime = false;
 			}
 			else if (buttonHandler.selection == 1)
 			{
-				details.helpText = !details.helpText;
-				details.setTopText();
-				buttonHandler.setVector(details.helpText);
+				details.textPanel.helpText = !details.textPanel.helpText;
+				details.textPanel.setText();
+				buttonHandler.setVector(details.textPanel.helpText);
 			}
 		}
 
-		details.update(maps.minesPlaced);
+		details.update(
+			maps.mineCount - maps.minesPlaced,
+			timer.getTime()
+		);
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C2D_TargetClear(top, clrBlack);

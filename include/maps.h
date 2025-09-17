@@ -33,7 +33,6 @@ public:
 	void placeMine(Vector2i _position);
 
 	bool mapCompleted();
-	bool getPlacedMinesCount();
 private:
 	std::vector<std::vector<int>> generatedMap;
 	std::vector<std::vector<bool>> mineMap;
@@ -41,10 +40,11 @@ private:
 
 	C2D_TextBuf textBuffer;
 	
-	C2D_Sprite tileSprite;
-	C2D_Sprite revealedSprite;
-	C2D_Sprite errorSprite;
-	C2D_Sprite flagSprite;
+	// it crashes all the time on actual hardware, need to initalize stuff better.
+	C2D_Sprite tileSprite = {0};
+	C2D_Sprite revealedSprite = {0};
+	C2D_Sprite errorSprite = {0};
+	C2D_Sprite flagSprite = {0};
 
 	int surroundingMines(Vector2i _position);
 	u32 getColor(TileColors _tileValue);
