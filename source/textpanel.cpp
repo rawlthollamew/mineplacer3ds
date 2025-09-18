@@ -14,7 +14,8 @@ TextPanel::TextPanel(float _textSize)
 		"    Hint: start from the outside and work your way in.\n\n"
 		"Controls: \n\n"
 		"    : Select current button (defaulted to new game)\n"
-		"    : Change button selection (bottom right of top screen)";
+		"    : Change button selection (bottom right of top screen)\n"
+		"    Press START anytime to quit the game.";
 	
 	lbString = "Leaderboard:\n\n";
 	

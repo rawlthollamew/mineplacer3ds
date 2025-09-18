@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 
 	Maps maps(sheet);
 	Details details(sheet, maps.mineCount, maps.dimentions, 1);
-	ButtonHandler buttonHandler(sheet, details.getInfoPosition(), details.getInfoPadding());
+	ButtonHandler buttonHandler(sheet, details.getInfoPosition(), details.getInfoPadding(), 0.75f);
 	Scores scores("sdmc://scores.txt");
 	details.textPanel.loadLeaderboardText(scores.lb);
 	Timer timer;

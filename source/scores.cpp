@@ -9,6 +9,10 @@ Scores::Scores(std::string _filename)
 void Scores::loadScores()
 {
 	FILE* scoresFile = fopen(filename.c_str(), "r");
+	
+	// fix a crash caused by scoresFile not existing beforehand.
+	if (!scoresFile) return;
+
 	std::string line;
 	
 	char buf[256];

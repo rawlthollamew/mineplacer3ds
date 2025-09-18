@@ -6,28 +6,31 @@ Button::Button()
 	color = 0;
 }
 
-Button::Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _text)
+Button::Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _text, float _textSize)
 {
 	position = _position;
 	sprite = _sprite;
 	color = _color;
+	textSize = _textSize;
 
 	initText(_text);
 }
 
 void Button::initText(std::string _text)
 {
-	Vector2f textSize = { 0, 0 };
+	Vector2f textDimentions = { 0, 0 };
 	
 	C2D_TextBuf buf = C2D_TextBufNew(4096);
 	C2D_TextParse(&text, buf, _text.c_str());
 	
-	C2D_TextGetDimensions(&text, 1.f, 1.f, &textSize.x, &textSize.y);
+	C2D_TextGetDimensions(&text, textSize, textSize, &textDimentions.x, &textDimentions.y);
 	
 	size = {
-		(float)sprite.image.subtex->width + textSize.x,
+		(float)sprite.image.subtex->width + textDimentions.x,
 		(float)sprite.image.subtex->height
 	};
+
+	textHeight = textDimentions.y;
 }
 
 void Button::draw()
@@ -48,24 +51,15 @@ void Button::draw()
 		&text,
 		C2D_WithColor,
 		position.x + sprite.image.subtex->width,
-		position.y - (size.y / 5.f),
+		position.y + ((size.y - textHeight) / 2.f),
 		0,
-		1.f,
-		1.f,
+		textSize,
+		textSize,
 		C2D_Color32f(1.f,1.f,1.f,1.f)
 	);
-
-	// if (_selected)
-	// {
-	// 	C2D_SpriteSetPos(&selectionLeft, position.x, position.y);
-	// 	C2D_DrawSprite(&selectionLeft);
-
-	// 	C2D_SpriteSetPos(&selectionRight, position.x + size.x - selectionRight.image.subtex->width, position.y);
-	// 	C2D_DrawSprite(&selectionRight);
-	// }
 }
 
-ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding)
+ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding, float _textSize)
 {
 	drawPosition = _drawPosition;
 	padding = _padding;
@@ -82,6 +76,7 @@ ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int
 	C2D_Sprite currentSprite;
 
 	C2D_SpriteFromSheet(&currentSprite, _sheet, newGamePng);
+	newGameButton.textSize = _textSize;
 	newGameButton.sprite = currentSprite;
 	newGameButton.color = backgroundColor;
 	newGameButton.initText("New");
@@ -91,6 +86,7 @@ ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int
 	};
 	
 	C2D_SpriteFromSheet(&currentSprite, _sheet, helpPng);
+	helpButton.textSize = _textSize;
 	helpButton.sprite = currentSprite;
 	helpButton.color = backgroundColor;
 	helpButton.initText("Help");
@@ -100,6 +96,7 @@ ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int
 	};
 	
 	C2D_SpriteFromSheet(&currentSprite, _sheet, lbPng);
+	lbButton.textSize = _textSize;
 	lbButton.sprite = currentSprite;
 	lbButton.color = backgroundColor;
 	lbButton.initText("Scores");
