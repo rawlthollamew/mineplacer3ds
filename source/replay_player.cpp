@@ -3,48 +3,48 @@
 ReplayPlayer::ReplayPlayer(C2D_SpriteSheet _sheet)
 	: replayMap(_sheet)
 {
-	for (int i = 0; i < 4; i++)
-	{
-		imageTint.corners[i].blend = 0.5f;
-		imageTint.corners[i].color = C2D_Color32f(1.f,0.f,0.f,1.f);
-	}
-	
+	score = Score{"", 0, {}, {}};
 	replayMap.initMaps();
+	
+	finished = false;
+	playing = false;
 
-	init();
-}
-
-void ReplayPlayer::init()
-{
-	started = false;
 	startTime = std::chrono::high_resolution_clock::now();
 	elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
 	movesDone = 0;
 }
 
-void ReplayPlayer::draw(Score _score)
+void ReplayPlayer::start(Score _score)
 {
-	if (!started)
+	score = _score;
+	startTime = std::chrono::high_resolution_clock::now();
+	elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
+	
+	replayMap.mineMap = _score.mineMap;
+	replayMap.initGeneratedMap();
+	movesDone = 0;
+	
+	finished = false;
+	playing = true;
+}
+
+void ReplayPlayer::draw()
+{
+	if (!finished)
 	{
-		startTime = std::chrono::high_resolution_clock::now();
 		elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
 		
-		replayMap.mineMap = _score.mineMap;
-		replayMap.initGeneratedMap();
-		movesDone = 0;
-		
-		started = true;
-	}
-
-	elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
-
-	for (int i = 0; i < (int)_score.moves.size(); i++)
-	{
-		if (elapsedTime.count() > _score.moves[i].ms && movesDone <= i)
+		if (movesDone < (int)score.moves.size())
 		{
-			movesDone += 1;
-			replayMap.placeMine(_score.moves[i].position);
+			int ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count();
+
+			if (ms >= score.moves[movesDone].ms)
+			{
+				replayMap.placeMine(score.moves[movesDone].position);
+				movesDone += 1;
+			}
 		}
+		else finished = true;
 	}
 	
 	replayMap.draw();
@@ -58,4 +58,22 @@ void ReplayPlayer::draw(Score _score)
 		bottomScreen.y,
 		C2D_Color32f(1.f, 0.f, 0.f, 0.2f)
 	);
+}
+
+int ReplayPlayer::getTime()
+{
+	if (!finished)
+	{
+		return (elapsedTime.count() * 1000);
+	}
+	else return score.time;
+}
+
+int ReplayPlayer::getMineCount()
+{
+	if (!finished)
+	{
+		return (replayMap.mineCount - movesDone);
+	}
+	else return 0;
 }

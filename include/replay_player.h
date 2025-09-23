@@ -12,15 +12,17 @@ class ReplayPlayer
 {
 public:
 	ReplayPlayer(C2D_SpriteSheet _sheet);
-	void init();
-	void draw(Score _score);
+	void start(Score _score);
+	void draw();
+	int getTime();
+	int getMineCount();
 private:
+	Score score;
 	Maps replayMap;
 
-	bool started;
+	bool finished;
+	bool playing;
 	int movesDone;
 	std::chrono::high_resolution_clock::time_point startTime;
 	std::chrono::duration<double, std::milli> elapsedTime;
-	
-	C2D_ImageTint imageTint;
 };
