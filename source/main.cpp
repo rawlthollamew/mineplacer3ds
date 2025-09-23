@@ -9,8 +9,8 @@
 #include "maps.h"
 #include "details.h"
 #include "buttons.h"
-#include "scores.h"
 #include "timer.h"
+#include "replay_manager.h"
 
 int main(int argc, char* argv[])
 {
@@ -27,14 +27,16 @@ int main(int argc, char* argv[])
 	C2D_SpriteSheet sheet = C2D_SpriteSheetLoad("romfs:/gfx/textures.t3x");
 
 	Maps maps(sheet);
+	maps.generate();
 	Details details(sheet, maps.mineCount, maps.dimentions, 1);
+	ReplayManager replays(sheet, "sdmc:/mineplacer/");
 	ButtonHandler buttonHandler(sheet, details.getInfoPosition(), details.getInfoPadding(), 0.75f);
-	Scores scores("sdmc://scores.txt");
-	details.textPanel.loadLeaderboardText(scores.lb);
+	details.textPanel.loadLeaderboardText(replays.scores);
 	Timer timer;
 
 	buttonHandler.setVector(details.textPanel.helpText);
 	bool submittedTime = false;
+	bool replay = false;
 	
 	while (aptMainLoop())
 	{
@@ -44,8 +46,10 @@ int main(int argc, char* argv[])
 
 			if (!submittedTime)
 			{
-				scores.insertScore(timer.getTime());
-				details.textPanel.loadLeaderboardText(scores.lb);
+				replays.saveReplay(replays.recorder.getMoves(), maps.mineMap, timer.getTime());
+
+				replays.getScores();
+				details.textPanel.loadLeaderboardText(replays.scores);				
 				submittedTime = true;
 			}
 		}
@@ -57,7 +61,16 @@ int main(int argc, char* argv[])
 		hidTouchRead(&touch);
 		
 		if (kDown & KEY_START) break;
-		else if (kDown & KEY_TOUCH) maps.placeMine({touch.px, touch.py});
+		else if (kDown & KEY_TOUCH)
+		{
+			Vector2i mapPosition = {
+				(int)(touch.px / maps.tileSize),
+				(int)(touch.py / maps.tileSize)
+			};
+
+			maps.placeMine(mapPosition);
+			replays.recorder.update(mapPosition);
+		}
 		else if (kDown & KEY_LEFT)
 		{
 			buttonHandler.selection -= 1;
@@ -74,6 +87,7 @@ int main(int argc, char* argv[])
 			{
 				maps.generate();
 				timer.reset();
+				replays.recorder.clear();
 				submittedTime = false;
 			}
 			else if (buttonHandler.selection == 1)
@@ -82,6 +96,10 @@ int main(int argc, char* argv[])
 				details.textPanel.setText();
 				buttonHandler.setVector(details.textPanel.helpText);
 			}
+		}
+		else if (kDown & KEY_B)
+		{
+			replay = !replay;
 		}
 
 		details.update(
@@ -97,7 +115,8 @@ int main(int argc, char* argv[])
 			
 			C2D_TargetClear(bottom, clrBlack);
 			C2D_SceneBegin(bottom);
-			maps.draw();
+			if (!replay) maps.draw();
+			else if (replay) replays.player.draw(replays.scores[0]);
 		C3D_FrameEnd(0);
 	}
 	

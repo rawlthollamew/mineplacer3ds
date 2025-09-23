@@ -69,8 +69,10 @@ ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int
 	
 	u32 backgroundColor = C2D_Color32f(1.f,1.f,1.f,0.5f);
 
-	C2D_SpriteFromSheet(&selectionLeft, _sheet, selectionLeftPng);
-	C2D_SpriteFromSheet(&selectionRight, _sheet, selectionRightPng);
+	C2D_SpriteFromSheet(&selectionTopLeft, _sheet, selectionTopLeftPng);
+	C2D_SpriteFromSheet(&selectionBottomLeft, _sheet, selectionBottomLeftPng);
+	C2D_SpriteFromSheet(&selectionTopRight, _sheet, selectionTopRightPng);
+	C2D_SpriteFromSheet(&selectionBottomRight, _sheet, selectionBottomRightPng);
 
 	// adding buttons
 	C2D_Sprite currentSprite;
@@ -125,11 +127,33 @@ void ButtonHandler::draw()
 		
 		if (i == selection)
 		{
-			C2D_SpriteSetPos(&selectionLeft, activeButtons[i].position.x, activeButtons[i].position.y);
-			C2D_DrawSprite(&selectionLeft);
+			C2D_SpriteSetPos(
+				&selectionTopLeft,
+				activeButtons[i].position.x,
+				activeButtons[i].position.y
+			);
+			C2D_DrawSprite(&selectionTopLeft);
 
-			C2D_SpriteSetPos(&selectionRight, activeButtons[i].position.x + activeButtons[i].size.x - selectionRight.image.subtex->width, activeButtons[i].position.y);
-			C2D_DrawSprite(&selectionRight);
+			C2D_SpriteSetPos(
+				&selectionBottomLeft,
+				activeButtons[i].position.x,
+				activeButtons[i].position.y + activeButtons[i].size.y - selectionBottomLeft.image.subtex->height
+			);
+			C2D_DrawSprite(&selectionBottomLeft);
+
+			C2D_SpriteSetPos(
+				&selectionTopRight,
+				activeButtons[i].position.x + activeButtons[i].size.x - selectionTopRight.image.subtex->width,
+				activeButtons[i].position.y
+			);
+			C2D_DrawSprite(&selectionTopRight);
+
+			C2D_SpriteSetPos(
+				&selectionBottomRight,
+				activeButtons[i].position.x + activeButtons[i].size.x - selectionBottomRight.image.subtex->width,
+				activeButtons[i].position.y + activeButtons[i].size.y - selectionBottomRight.image.subtex->height
+			);
+			C2D_DrawSprite(&selectionBottomRight);
 		}
 
 		currentOffset += activeButtons[i].size.x + padding;

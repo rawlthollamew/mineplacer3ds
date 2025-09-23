@@ -40,13 +40,3 @@ std::string Timer::intAsTime(int _timeSeconds)
 
 	return timeFormat(hours) + ":" + timeFormat(minutes) + ":" + timeFormat(seconds);
 }
-
-std::string Timer::epochToDate(int _epoch)
-{
-	std::time_t t = static_cast<std::time_t>(_epoch);
-	std::string result = std::string(std::asctime(std::localtime(&t)));
-
-	// removes the last charcter (being a \n)
-	if (!result.empty()) result.pop_back();
-	return result;
-}

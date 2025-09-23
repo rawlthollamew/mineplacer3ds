@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "utils.h"
-#include "scores.h"
 
 class TextPanel
 {

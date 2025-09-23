@@ -16,7 +16,6 @@ public:
 	}
 
 	std::string intAsTime(int _timeValue);
-	static std::string epochToDate(int _epoch);
 	
 private:
 	std::string timeFormat(int _timeValue);

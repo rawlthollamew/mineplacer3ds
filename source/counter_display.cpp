@@ -1,4 +1,4 @@
-#include "counterdisplay.h"
+#include "counter_display.h"
 
 CounterDisplay::CounterDisplay()
 	: CounterDisplay(C2D_Sprite(), 0, 0.f, {0,0}, 0, {0,0})
@@ -6,8 +6,10 @@ CounterDisplay::CounterDisplay()
 }
 
 CounterDisplay::CounterDisplay(C2D_Sprite _icon, int _padding, float _textSize, Vector2f _digitSize, int _digits, Vector2i _position)
-	: padding(_padding), textSize(_textSize), digits(_digits)
 {
+	padding = _padding;
+	textSize = _textSize;
+	digits = _digits;
 	icon = _icon;
 	position = _position;
 	digitSize = _digitSize;

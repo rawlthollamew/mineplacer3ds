@@ -28,23 +28,25 @@ public:
 	int minesPlaced = 0;
 	Vector2i dimentions = { bottomScreen.x / tileSize, bottomScreen.y / tileSize };
 
+	void initMaps();
 	void generate();
+	void initGeneratedMap();
 	void draw();
 	void placeMine(Vector2i _position);
 
 	bool mapCompleted();
-private:
+
 	std::vector<std::vector<int>> generatedMap;
 	std::vector<std::vector<bool>> mineMap;
 	std::vector<std::vector<bool>> playerMap;
+private:
 
 	C2D_TextBuf textBuffer;
 	
-	// it crashes all the time on actual hardware, need to initalize stuff better.
-	C2D_Sprite tileSprite = {0};
-	C2D_Sprite revealedSprite = {0};
-	C2D_Sprite errorSprite = {0};
-	C2D_Sprite flagSprite = {0};
+	C2D_Sprite tileSprite;
+	C2D_Sprite revealedSprite;
+	C2D_Sprite errorSprite;
+	C2D_Sprite flagSprite;
 
 	int surroundingMines(Vector2i _position);
 	u32 getColor(TileColors _tileValue);

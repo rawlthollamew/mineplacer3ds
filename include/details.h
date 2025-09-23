@@ -7,9 +7,8 @@
 #include <vector>
 
 #include "utils.h"
-#include "scores.h"
-#include "counterdisplay.h"
-#include "textpanel.h"
+#include "counter_display.h"
+#include "text_panel.h"
 #include "timer.h"
 
 // buttons
