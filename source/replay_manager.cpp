@@ -97,6 +97,7 @@ void ReplayManager::saveReplay(std::vector<Move> _moves, std::vector<std::vector
 
 void ReplayManager::getScores()
 {
+	scores.clear();
 	DIR* replaysDir = opendir(directory.c_str());
 	if (!replaysDir) return ;
 

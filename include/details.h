@@ -1,8 +1,6 @@
 #pragma once
 #include <3ds.h>
 #include <citro2d.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
 #include <vector>
 
@@ -20,13 +18,19 @@ public:
 	Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions, float _textSize);
 	~Details();
 	
-	void update(int _minesPlaced, int _currentTime);
+	bool replayMode;
+
+	void update(u32 _color, int _minesPlaced, int _currentTime);
 	void draw();
+	void drawSelection(int _selection);
 
 	TextPanel textPanel;
 	Vector2i getInfoPosition() { return infoPosition; }
 	int getInfoPadding() { return infoPadding; }
+	void initReplayText(int _finalTime, std::string _name);
 private:
+	u32 infoColor;
+
 	CounterDisplay mines;
 	C2D_Sprite mineSprite;
 
@@ -35,6 +39,14 @@ private:
 
 	Vector2i infoPosition;
 	Vector2i infoSize;
+
+	C2D_Text replayText;
+	C2D_TextBuf replayBuf;
+
+	C2D_Sprite selectionTopLeft;
+	C2D_Sprite selectionBottomLeft;
+	C2D_Sprite selectionTopRight;
+	C2D_Sprite selectionBottomRight;
 	
 	int infoPadding;
 	int mineCount;
