@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
 	buttonHandler.setVector(details.textPanel.helpText);
 	bool submittedTime = false;
-	bool replay = false;
+	bool playingreplay = false;
 	
 	while (aptMainLoop())
 	{
@@ -99,7 +99,8 @@ int main(int argc, char* argv[])
 		}
 		else if (kDown & KEY_B)
 		{
-			replay = !replay;
+			replays.player.start(replays.scores[0]);
+			playingreplay = !playingreplay;
 		}
 
 		details.update(
@@ -115,8 +116,8 @@ int main(int argc, char* argv[])
 			
 			C2D_TargetClear(bottom, clrBlack);
 			C2D_SceneBegin(bottom);
-			if (!replay) maps.draw();
-			else if (replay) replays.player.draw(replays.scores[0]);
+			if (!playingreplay) maps.draw();
+			else if (playingreplay) replays.player.draw();
 		C3D_FrameEnd(0);
 	}
 	

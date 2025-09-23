@@ -63,13 +63,13 @@ void ReplayManager::saveReplay(std::vector<Move> _moves, std::vector<std::vector
 	json_object_set_new(root, "username", json_string(username.c_str()));
 	json_object_set_new(root, "time", json_integer(_finalTime));
 
-	for (int i = 0; i < (int)_map.size(); i++)
+	for (int y = 0; y < (int)_map.size(); y++)
 	{
 		json_t* jsonRow = json_array();
 
-		for (int j = 0; j < (int)_map[0].size(); j++)
+		for (int x = 0; x < (int)_map[y].size(); x++)
 		{
-			json_array_append_new(jsonRow, json_boolean(_map[j][i]));
+			json_array_append_new(jsonRow, json_boolean(_map[y][x]));
 		}
 		json_array_append_new(map, jsonRow);
 	}
@@ -93,56 +93,6 @@ void ReplayManager::saveReplay(std::vector<Move> _moves, std::vector<std::vector
 
 	json_dump_file(root, filename.c_str(), JSON_INDENT(4));
 	json_decref(root);
-}
-
-void ReplayManager::loadReplay(std::string _filename)
-{
-	json_t* root;
-	json_error_t error;
-	root = json_load_file(_filename.c_str(), 0, &error);
-
-	if (!root) return;
-
-	Score currentScore;
-	currentScore.time = (int)json_integer_value(json_object_get(root, "time"));
-	currentScore.username = (int)json_integer_value(json_object_get(root, "username"));
-
-	json_t* map = json_object_get(root, "map");
-	int rows = json_array_size(map);
-	for (int i = 0; i < rows; i++)
-	{
-		json_t* row = json_array_get(map, i);
-		int cols = json_array_size(row);
-		std::vector<bool> newRow;
-
-		for (int j = 0; j < cols; j++)
-		{
-			newRow.push_back((int)json_boolean_value(json_array_get(row, j)));
-		}
-
-		currentScore.mineMap.push_back(newRow);
-	}
-	
-	json_t* moves = json_object_get(root, "moves");
-	int moveCount = json_array_size(moves);
-
-	for (int i = 0; i < moveCount; i++)
-	{
-		json_t* moveObject = json_array_get(moves, i);
-		json_t* pos = json_object_get(moveObject, "position");
-
-		currentScore.moves.push_back({
-			(int)json_integer_value(json_object_get(moveObject, "time")),
-			{
-				// gets the x and y
-				(int)json_integer_value(json_array_get(pos, 0)),
-				(int)json_integer_value(json_array_get(pos, 1))
-			}
-		});
-	}
-	
-	// load 2darray generatedmap and moves
-	player.draw(currentScore);
 }
 
 void ReplayManager::getScores()
@@ -193,11 +143,11 @@ void ReplayManager::getScores()
 				Move newMove;
 				json_t* currentMoveNode = json_array_get(movesNode, i);
 				
-				newMove.ms = (int)json_integer_value(json_array_get(currentMoveNode, 0));
+				newMove.ms = (int)json_integer_value(json_object_get(currentMoveNode, "time"));
 				json_t* positionNode = json_object_get(currentMoveNode, "position");
 				newMove.position = {
-					(int)json_integer_value(json_array_get(positionNode, 1)),
-					(int)json_integer_value(json_array_get(positionNode, 0))
+					(int)json_integer_value(json_array_get(positionNode, 0)),
+					(int)json_integer_value(json_array_get(positionNode, 1))
 				};
 
 				newScore.moves[i] = newMove;

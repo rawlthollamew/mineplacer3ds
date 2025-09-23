@@ -21,7 +21,6 @@ public:
 	std::vector<Score> scores;
 
 	void saveReplay(std::vector<Move> _moves, std::vector<std::vector<bool>> _map, int _finalTime);
-	void loadReplay(std::string _filename);
 	void getScores();
 private:
 	std::string directory;
