@@ -4,6 +4,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include <string>
+#include <vector>
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -17,8 +18,10 @@ enum PngOrder
 	newGamePng,
 	helpPng,
 	lbPng,
-	selectionLeftPng,
-	selectionRightPng
+	selectionTopLeftPng,
+	selectionBottomLeftPng,
+	selectionTopRightPng,
+	selectionBottomRightPng
 };
 
 struct Vector2f
@@ -35,3 +38,18 @@ struct Vector2i
 
 const Vector2i topScreen = {400, 240};
 const Vector2i bottomScreen = {320, 240};
+
+struct Move
+{
+	int ms;
+	Vector2i position;
+};
+
+struct Score
+{
+	std::string username;
+	int time;
+
+	std::vector<Move> moves;
+	std::vector<std::vector<bool>> mineMap;
+};

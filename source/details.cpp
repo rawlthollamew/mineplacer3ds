@@ -13,7 +13,7 @@ Details::Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions, f
 	Vector2f digitSize = getDigitSize(_textSize);
 	
 	mines = CounterDisplay(mineSprite, infoPadding, _textSize, digitSize, 2, {0, infoPosition.y});
-	times = CounterDisplay(timeSprite, infoPadding, _textSize, digitSize, 2, {mines.size.x, infoPosition.y});
+	times = CounterDisplay(timeSprite, infoPadding, _textSize, digitSize, 2, {(int)mines.size.x, infoPosition.y});
 }
 
 Details::~Details()

@@ -6,12 +6,19 @@ Maps::Maps(C2D_SpriteSheet& _sheet)
 	
 	textBuffer = C2D_TextBufNew(4096);
 	
-	generate();
+	initMaps();
 
 	C2D_SpriteFromSheet(&tileSprite, _sheet, tilePng);
 	C2D_SpriteFromSheet(&revealedSprite, _sheet, revealedPng);
 	C2D_SpriteFromSheet(&errorSprite, _sheet, errorPng);
 	C2D_SpriteFromSheet(&flagSprite, _sheet, flagPng);
+}
+
+void Maps::initMaps()
+{
+	mineMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
+	playerMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
+	generatedMap.assign(dimentions.y, std::vector<int>(dimentions.x, 0));
 }
 
 int Maps::surroundingMines(Vector2i _position)
@@ -34,16 +41,24 @@ int Maps::surroundingMines(Vector2i _position)
 		}
 	}
 
-    return totalMines;
+	return totalMines;
+}
+
+void Maps::initGeneratedMap()
+{
+	for (int x = 0; x < dimentions.x; x++)
+	{
+		for (int y = 0; y < dimentions.y; y++)
+		{
+			generatedMap[y][x] = surroundingMines({x, y});
+		}
+	}
 }
 
 void Maps::generate()
 {
 	int minesPlaced = 0;
-
-	mineMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
-	playerMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
-	generatedMap.assign(dimentions.y, std::vector<int>(dimentions.x, 0));
+	initMaps();
 
 	while (minesPlaced < mineCount)
 	{
@@ -57,13 +72,7 @@ void Maps::generate()
 		}
 	}
 
-	for (int x = 0; x < dimentions.x; x++)
-	{
-		for (int y = 0; y < dimentions.y; y++)
-		{
-			generatedMap[y][x] = surroundingMines({x, y});
-		}
-	}
+	initGeneratedMap();
 }
 
 void Maps::draw()
@@ -137,12 +146,10 @@ void Maps::draw()
 
 void Maps::placeMine(Vector2i _position)
 {
-	Vector2i mapPosition = {_position.x / tileSize, _position.y / tileSize};
-
-	if (mapPosition.x >= 0 && mapPosition.x < dimentions.x &&
-		mapPosition.y >= 0 && mapPosition.y < dimentions.y)
+	if (_position.x >= 0 && _position.x < dimentions.x &&
+		_position.y >= 0 && _position.y < dimentions.y)
 	{
-		playerMap[mapPosition.y][mapPosition.x] = !playerMap[mapPosition.y][mapPosition.x];
+		playerMap[_position.y][_position.x] = !playerMap[_position.y][_position.x];
 	
 		std::vector<Vector2i> moves = {
 			{0,0}, {1,0}, {-1,0}, {0,1}, {0,-1},
@@ -151,13 +158,13 @@ void Maps::placeMine(Vector2i _position)
 	
 		for (Vector2i currentMove : moves)
 		{
-			Vector2i currentPosition = {mapPosition.x + currentMove.x, mapPosition.y + currentMove.y};
+			Vector2i currentPosition = {_position.x + currentMove.x, _position.y + currentMove.y};
 	
 			if (currentPosition.x >= 0 && currentPosition.x < dimentions.x &&
 				currentPosition.y >= 0 && currentPosition.y < dimentions.y)
 			{
-				if (playerMap[mapPosition.y][mapPosition.x]) generatedMap[currentPosition.y][currentPosition.x] -= 1;
-				else if (!playerMap[mapPosition.y][mapPosition.x]) generatedMap[currentPosition.y][currentPosition.x] += 1;
+				if (playerMap[_position.y][_position.x]) generatedMap[currentPosition.y][currentPosition.x] -= 1;
+				else if (!playerMap[_position.y][_position.x]) generatedMap[currentPosition.y][currentPosition.x] += 1;
 			}
 		}
 	}
@@ -180,7 +187,7 @@ bool Maps::mapCompleted()
 
 	minesPlaced = minesPlacedCount;
 
-    if (count == 0) return true;
+	if (count == 0) return true;
 	else return false;
 }
 

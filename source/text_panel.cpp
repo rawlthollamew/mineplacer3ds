@@ -1,4 +1,4 @@
-#include "textpanel.h"
+#include "text_panel.h"
 
 TextPanel::TextPanel(float _textSize)
 	: textSize(_textSize)
@@ -17,7 +17,7 @@ TextPanel::TextPanel(float _textSize)
 		"    : Change button selection (bottom right of top screen)\n"
 		"    Press START anytime to quit the game.";
 	
-	lbString = "Leaderboard:\n\n";
+	lbString = "Leaderboard: (press up/down to go through scores)\n\n";
 	
 	helpText = true;
 	currentString = helpString;
@@ -26,11 +26,13 @@ TextPanel::TextPanel(float _textSize)
 
 void TextPanel::loadLeaderboardText(std::vector<Score> _scores)
 {
-	lbString = "Leaderboard:\n\n";
+	lbString = "Leaderboard: (press up/down to go through scores)\n\n";
 
-	for (int i = 0; i < (int)_scores.size(); i++)	
+	// max of 10 items on the lb.
+	// get the minimum between 10 and number of scores there are.
+	for (int i = 0; i < (int)std::min((size_t)10, _scores.size()); i++)
 	{
-		lbString = lbString + std::to_string(i + 1) + ": " + _scores[i].name + "(" + std::to_string(_scores[i].finalScore) + ")\n";
+		lbString = lbString + std::to_string(i + 1) + ": " + _scores[i].username + "(" + std::to_string(_scores[i].time) + ")\n";
 	}
 
 	setText();

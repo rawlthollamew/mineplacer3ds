@@ -35,8 +35,10 @@ public:
 	int buttonCount;
 	int selection;
 
-	C2D_Sprite selectionLeft;
-	C2D_Sprite selectionRight;
+	C2D_Sprite selectionTopLeft;
+	C2D_Sprite selectionBottomLeft;
+	C2D_Sprite selectionTopRight;
+	C2D_Sprite selectionBottomRight;
 
 	ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding, float _textSize);
 	void draw();
