@@ -60,6 +60,7 @@ void CounterDisplay::drawText()
 	C2D_Text counterText;
 	C2D_TextBufClear(counterBuffer);
 	C2D_TextParse(&counterText, counterBuffer, valueString.c_str());
+	C2D_TextOptimize(&counterText);
 
 	// centered text
 	Vector2f textOffset = {

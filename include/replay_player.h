@@ -11,18 +11,22 @@
 class ReplayPlayer
 {
 public:
-	ReplayPlayer(C2D_SpriteSheet _sheet);
+	ReplayPlayer(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions);
 	void start(Score _score);
 	void draw();
 	int getTime();
 	int getMineCount();
+	bool finished;
+	bool playing;
 private:
 	Score score;
 	Maps replayMap;
 
-	bool finished;
-	bool playing;
 	int movesDone;
+	int mineCount;
+
+	Vector2i dimentions;
+
 	std::chrono::high_resolution_clock::time_point startTime;
 	std::chrono::duration<double, std::milli> elapsedTime;
 };

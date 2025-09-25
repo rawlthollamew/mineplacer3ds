@@ -12,6 +12,10 @@
 #include "timer.h"
 #include "replay_manager.h"
 
+const int tileSize = 20;
+const int mineCount = 50;
+const Vector2i dimentions = { bottomScreen.x / tileSize, bottomScreen.y / tileSize };
+
 int main(int argc, char* argv[])
 {
 	gfxInitDefault();
@@ -19,29 +23,34 @@ int main(int argc, char* argv[])
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	romfsInit();
 	C2D_Prepare();
-
+	
 	C3D_RenderTarget* top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	C3D_RenderTarget* bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-
+	
 	u32 clrBlack = C2D_Color32f(0.f, 0.f, 0.f, 0.f);
 	C2D_SpriteSheet sheet = C2D_SpriteSheetLoad("romfs:/gfx/textures.t3x");
-
-	Maps maps(sheet);
+	
+	Maps maps(sheet, tileSize, mineCount, dimentions);
 	maps.generate();
-	Details details(sheet, maps.mineCount, maps.dimentions, 1);
-	ReplayManager replays(sheet, "sdmc:/mineplacer/");
+
+	Details details(sheet, mineCount, dimentions, 1);
 	ButtonHandler buttonHandler(sheet, details.getInfoPosition(), details.getInfoPadding(), 0.75f);
+	
+	ReplayManager replays(sheet, tileSize, mineCount, dimentions, "sdmc:/mineplacer/");
 	details.textPanel.loadLeaderboardText(replays.scores);
+
 	Timer timer;
 
 	buttonHandler.setVector(details.textPanel.helpText);
 	bool submittedTime = false;
-	bool playingreplay = false;
+	bool completed = maps.mapCompleted();
 	int replaySelection = 0;
 	
 	while (aptMainLoop())
 	{
-		if (maps.mapCompleted())
+		completed = maps.mapCompleted();
+
+		if (completed)
 		{
 			timer.stop();
 
@@ -62,11 +71,11 @@ int main(int argc, char* argv[])
 		hidTouchRead(&touch);
 		
 		if (kDown & KEY_START) break;
-		else if (kDown & KEY_TOUCH)
+		else if ((kDown & KEY_TOUCH) && !completed)
 		{
 			Vector2i mapPosition = {
-				(int)(touch.px / maps.tileSize),
-				(int)(touch.py / maps.tileSize)
+				(int)(touch.px / tileSize),
+				(int)(touch.py / tileSize)
 			};
 
 			maps.placeMine(mapPosition);
@@ -79,15 +88,16 @@ int main(int argc, char* argv[])
 		}
 		else if (kDown & KEY_DOWN)
 		{
+			// lb has a max size of 8.
 			replaySelection += 1;
-			if (replaySelection >= (int)replays.scores.size()) replaySelection = (int)replays.scores.size() - 1;
+			if (replaySelection >= (int)std::min((size_t)8, replays.scores.size())) replaySelection = std::min((size_t)8, replays.scores.size()) - 1;
 		}
-		else if (kDown & KEY_LEFT)
+		else if (kDown & KEY_L)
 		{
 			buttonHandler.selection -= 1;
 			if (buttonHandler.selection < 0) buttonHandler.selection = 0;
 		}
-		else if (kDown & KEY_RIGHT)
+		else if (kDown & KEY_R)
 		{
 			buttonHandler.selection += 1;
 			if (buttonHandler.selection >= buttonHandler.buttonCount) buttonHandler.selection = buttonHandler.buttonCount - 1;
@@ -99,6 +109,7 @@ int main(int argc, char* argv[])
 				maps.generate();
 				timer.reset();
 				replays.recorder.clear();
+				replays.player.playing = false;
 				submittedTime = false;
 			}
 			else if (buttonHandler.selection == 1)
@@ -108,31 +119,32 @@ int main(int argc, char* argv[])
 				buttonHandler.setVector(details.textPanel.helpText);
 			}
 		}
-		else if (kDown & KEY_B)
+		else if (kDown & KEY_X)
 		{
 			replays.player.start(replays.scores[replaySelection]);
-			playingreplay = !playingreplay;
-			if (playingreplay) details.initReplayText(replays.scores[replaySelection].time, replays.scores[replaySelection].username);
-			details.replayMode = playingreplay;
+			replays.player.playing = !replays.player.playing;
+			if (replays.player.playing) details.initReplayText(replays.scores[replaySelection].time, replays.scores[replaySelection].username);
 		}
+		
+		details.replayMode = replays.player.playing;
 
 		details.update(
-			(playingreplay) ? C2D_Color32f(0.f, 0.f, 1.f, 0.5f) : C2D_Color32f(1.f, 1.f, 1.f, 0.5f),
-			(playingreplay) ? replays.player.getMineCount() : maps.mineCount - maps.minesPlaced,
-			(playingreplay) ? replays.player.getTime() : timer.getTime()
+			(replays.player.playing) ? C2D_Color32f(0.f, 0.f, 1.f, 0.5f) : C2D_Color32f(1.f, 1.f, 1.f, 0.5f),
+			(replays.player.playing) ? replays.player.getMineCount() : mineCount - maps.minesPlaced,
+			(replays.player.playing) ? replays.player.getTime() : timer.getTime()
 		);
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C2D_TargetClear(top, clrBlack);
 			C2D_SceneBegin(top);
-			details.draw();
 			if (!details.textPanel.helpText) details.drawSelection(replaySelection);
+			details.draw();
 			buttonHandler.draw();
 			
 			C2D_TargetClear(bottom, clrBlack);
 			C2D_SceneBegin(bottom);
-			if (!playingreplay) maps.draw();
-			else if (playingreplay) replays.player.draw();
+			if (!replays.player.playing) maps.draw();
+			else if (replays.player.playing) replays.player.draw();
 		C3D_FrameEnd(0);
 	}
 	

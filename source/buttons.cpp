@@ -22,6 +22,7 @@ void Button::initText(std::string _text)
 	
 	C2D_TextBuf buf = C2D_TextBufNew(4096);
 	C2D_TextParse(&text, buf, _text.c_str());
+	C2D_TextOptimize(&text);
 	
 	C2D_TextGetDimensions(&text, textSize, textSize, &textDimentions.x, &textDimentions.y);
 	

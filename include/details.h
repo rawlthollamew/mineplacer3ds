@@ -50,5 +50,6 @@ private:
 	
 	int infoPadding;
 	int mineCount;
-	static Vector2f getDigitSize(float _textSize);
+	Vector2f halfDigitSize;
+	Vector2f digitSize;
 };

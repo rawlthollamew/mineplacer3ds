@@ -17,7 +17,15 @@ Details::Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions, f
 	infoPosition = {0, topScreen.y - mineSprite.image.subtex->height - (infoPadding * 2)};
 	infoSize = {topScreen.x, mineSprite.image.subtex->height + (infoPadding * 2)};
 
-	Vector2f digitSize = getDigitSize(_textSize);
+	C2D_Text digitText;
+	C2D_TextBuf digitBuf = C2D_TextBufNew(256);
+	
+	digitSize = {0, 0};
+	halfDigitSize = {0, 0};
+	
+	C2D_TextParse(&digitText, digitBuf, "0");
+	C2D_TextGetDimensions(&digitText, 1.f, 1.f, &digitSize.x, &digitSize.y);
+	C2D_TextGetDimensions(&digitText, 0.5f, 0.5f, &halfDigitSize.x, &halfDigitSize.y);
 	
 	mines = CounterDisplay(mineSprite, infoPadding, _textSize, digitSize, 2, {0, infoPosition.y});
 	times = CounterDisplay(timeSprite, infoPadding, _textSize, digitSize, 2, {(int)mines.size.x, infoPosition.y});
@@ -29,20 +37,7 @@ Details::Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions, f
 
 Details::~Details()
 {
-	;
-}
-
-Vector2f Details::getDigitSize(float _textSize)
-{
-	C2D_Text text;
-	C2D_TextBuf buf = C2D_TextBufNew(256);
-	
-	Vector2f digitSize = { 0, 0 };
-	
-	C2D_TextParse(&text, buf, "0");
-	C2D_TextGetDimensions(&text, _textSize, _textSize, &digitSize.x, &digitSize.y);
-
-	return digitSize;
+	C2D_TextBufDelete(replayBuf);
 }
 
 void Details::initReplayText(int _finalTime, std::string _name)
@@ -52,6 +47,7 @@ void Details::initReplayText(int _finalTime, std::string _name)
 		"    Time: " + std::to_string(_finalTime) + "    Player: " + _name;
 
 	C2D_TextParse(&replayText, replayBuf, replayString.c_str());
+	C2D_TextOptimize(&replayText);
 }
 
 void Details::draw()
@@ -65,12 +61,15 @@ void Details::draw()
 		infoColor
 	);
 
+	textPanel.draw({infoPadding, infoPadding});
+	mines.draw();
+	times.draw();
+
 	if (replayMode)
 	{
-		float replayTextSize = 0.5f;
 		Vector2i replaySize = {
 			topScreen.x,
-			getDigitSize(replayTextSize).y * 2
+			(int)(halfDigitSize.y * 2)
 		};
 
 		Vector2i replayPosition = {
@@ -84,7 +83,7 @@ void Details::draw()
 			0,
 			replaySize.x,
 			replaySize.y,
-			C2D_Color32f(0.f,0.f,1.f,0.2f)
+			C2D_Color32f(0.f,0.f,0.2f,1.f)
 		);
 
 		C2D_DrawText(
@@ -100,24 +99,17 @@ void Details::draw()
 
 		C2D_TextBufClear(replayBuf);
 	}
-
-	textPanel.draw({infoPadding, infoPadding});
-	mines.draw();
-	times.draw();
 }
 
 void Details::drawSelection(int _selection)
 {
-	// textpanel textsize
-	Vector2f selectionDigitSize = getDigitSize(0.5f);
-
 	Vector2f selectionBoxSize = {
-		topScreen.x - 60,
-		selectionDigitSize.y * 2
+		(float)(topScreen.x),
+		halfDigitSize.y * 2
 	};
 	Vector2f selectionBoxPosition = {
 		0,
-		selectionDigitSize.y * (_selection + 2)
+		halfDigitSize.y * (_selection + 4) + infoPadding
 	};
 
 	C2D_SpriteSetPos(
@@ -129,19 +121,19 @@ void Details::drawSelection(int _selection)
 	C2D_SpriteSetPos(
 		&selectionBottomLeft,
 		selectionBoxPosition.x,
-		selectionBoxPosition.y + selectionBoxSize.y - selectionDigitSize.y
+		selectionBoxPosition.y + selectionBoxSize.y - halfDigitSize.y
 	);
 
 	C2D_SpriteSetPos(
 		&selectionTopRight,
-		selectionBoxPosition.x + selectionBoxSize.x - selectionDigitSize.x,
+		selectionBoxPosition.x + selectionBoxSize.x - halfDigitSize.x,
 		selectionBoxPosition.y
 	);
 
 	C2D_SpriteSetPos(
 		&selectionBottomRight,
-		selectionBoxPosition.x + selectionBoxSize.x - selectionDigitSize.x,
-		selectionBoxPosition.y + selectionBoxSize.y - selectionDigitSize.y
+		selectionBoxPosition.x + selectionBoxSize.x - halfDigitSize.x,
+		selectionBoxPosition.y + selectionBoxSize.y - halfDigitSize.y
 	);
 
 	C2D_DrawSprite(&selectionTopLeft);

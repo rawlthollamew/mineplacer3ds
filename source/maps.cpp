@@ -1,12 +1,14 @@
 #include "maps.h"
 
-Maps::Maps(C2D_SpriteSheet& _sheet)
+Maps::Maps(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions)
 {
-	srand(time(0));
 	
 	textBuffer = C2D_TextBufNew(4096);
+	tileSize = _tileSize;
+	mineCount = _mineCount;
+	dimentions = _dimentions;
 	
-	initMaps();
+	clearMaps();
 
 	C2D_SpriteFromSheet(&tileSprite, _sheet, tilePng);
 	C2D_SpriteFromSheet(&revealedSprite, _sheet, revealedPng);
@@ -14,7 +16,7 @@ Maps::Maps(C2D_SpriteSheet& _sheet)
 	C2D_SpriteFromSheet(&flagSprite, _sheet, flagPng);
 }
 
-void Maps::initMaps()
+void Maps::clearMaps()
 {
 	mineMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
 	playerMap.assign(dimentions.y, std::vector<bool>(dimentions.x, false));
@@ -57,8 +59,9 @@ void Maps::initGeneratedMap()
 
 void Maps::generate()
 {
-	int minesPlaced = 0;
-	initMaps();
+	srand(time(0));
+	minesPlaced = 0;
+	clearMaps();
 
 	while (minesPlaced < mineCount)
 	{
@@ -180,14 +183,15 @@ bool Maps::mapCompleted()
 	{
 		for (int y = 0; y < dimentions.y; y++)
 		{
-			count += generatedMap[y][x];
+			// sometimes negative cancels out count to be 0.
+			count += abs(generatedMap[y][x]);
 			minesPlacedCount += playerMap[y][x];
 		}
 	}
 
 	minesPlaced = minesPlacedCount;
 
-	if (count == 0) return true;
+	if (count == 0 && minesPlacedCount == mineCount) return true;
 	else return false;
 }
 

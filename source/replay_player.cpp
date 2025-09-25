@@ -1,10 +1,11 @@
 #include "replay_player.h"
 
-ReplayPlayer::ReplayPlayer(C2D_SpriteSheet _sheet)
-	: replayMap(_sheet)
+ReplayPlayer::ReplayPlayer(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions)
+	: replayMap(_sheet, _tileSize, _mineCount, _dimentions)
 {
 	score = Score{"", 0, {}, {}};
-	replayMap.initMaps();
+	dimentions = _dimentions;
+	replayMap.clearMaps();
 	
 	finished = false;
 	playing = false;
@@ -12,6 +13,7 @@ ReplayPlayer::ReplayPlayer(C2D_SpriteSheet _sheet)
 	startTime = std::chrono::high_resolution_clock::now();
 	elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
 	movesDone = 0;
+	mineCount = _mineCount;
 }
 
 void ReplayPlayer::start(Score _score)
@@ -20,13 +22,10 @@ void ReplayPlayer::start(Score _score)
 	startTime = std::chrono::high_resolution_clock::now();
 	elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
 	
-	replayMap.initMaps();
+	replayMap.clearMaps();
 	replayMap.mineMap = _score.mineMap;
 	replayMap.initGeneratedMap();
 	movesDone = 0;
-	
-	finished = false;
-	playing = true;
 }
 
 void ReplayPlayer::draw()
@@ -42,6 +41,17 @@ void ReplayPlayer::draw()
 			if (ms >= score.moves[movesDone].ms)
 			{
 				replayMap.placeMine(score.moves[movesDone].position);
+
+				mineCount = mineCount;
+
+				for (int y = 0; y < dimentions.y; y++)
+				{
+					for (int x = 0; x < dimentions.x; x++)
+					{
+						if (replayMap.playerMap[y][x]) mineCount -= 1;
+					}
+				}
+
 				movesDone += 1;
 			}
 		}
@@ -69,19 +79,6 @@ int ReplayPlayer::getTime()
 
 int ReplayPlayer::getMineCount()
 {
-	if (!finished)
-	{
-		int minesPlaced = 0;
-
-		for (int y = 0; y < replayMap.dimentions.y; y++)
-		{
-			for (int x = 0; x < replayMap.dimentions.x; x++)
-			{
-				if (replayMap.playerMap[y][x]) minesPlaced += 1;
-			}
-		}
-		
-		return replayMap.mineCount - minesPlaced;
-	}
+	if (!finished) return mineCount;
 	else return 0;
 }

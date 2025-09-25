@@ -1,7 +1,7 @@
 #include "replay_manager.h"
 
-ReplayManager::ReplayManager(C2D_SpriteSheet _sheet, std::string _directory)
-	: player(_sheet), directory(_directory)
+ReplayManager::ReplayManager(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions, std::string _directory)
+	: player(_sheet, _tileSize, _mineCount, _dimentions), directory(_directory)
 {
 	mkdir(_directory.c_str(), 0777);
 	getScores();
@@ -12,8 +12,8 @@ std::string ReplayManager::playerInput(int _finalTime)
 	std::string hintText = "Please enter your name to submit your score (" + std::to_string(_finalTime) + ")";
 
 	SwkbdState swkbd;
-	//usernames are 20 long.
-	char buf[20];
+	// usernames will be 40 bytes long.
+	char buf[40];
 	SwkbdButton button = SWKBD_BUTTON_NONE;
 	
 	swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 2, -1);
