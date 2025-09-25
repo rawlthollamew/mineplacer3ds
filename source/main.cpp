@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
 		details.update(
 			(replays.player.playing) ? C2D_Color32f(0.f, 0.f, 1.f, 0.5f) : C2D_Color32f(1.f, 1.f, 1.f, 0.5f),
-			(replays.player.playing) ? replays.player.getMineCount() : mineCount - maps.minesPlaced,
+			(replays.player.playing) ? mineCount - replays.player.getMinesPlaced() : mineCount - maps.minesPlaced,
 			(replays.player.playing) ? replays.player.getTime() : timer.getTime()
 		);
 

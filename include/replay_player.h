@@ -15,7 +15,7 @@ public:
 	void start(Score _score);
 	void draw();
 	int getTime();
-	int getMineCount();
+	int getMinesPlaced();
 	bool finished;
 	bool playing;
 private:
@@ -23,7 +23,8 @@ private:
 	Maps replayMap;
 
 	int movesDone;
-	int mineCount;
+	int minesPlaced;
+	int minesCount;
 
 	Vector2i dimentions;
 

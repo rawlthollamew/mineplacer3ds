@@ -9,7 +9,7 @@ CounterDisplay::CounterDisplay(C2D_Sprite _icon, int _padding, float _textSize, 
 {
 	padding = _padding;
 	textSize = _textSize;
-	digits = _digits;
+	defaultDigits = _digits;
 	icon = _icon;
 	position = _position;
 	digitSize = _digitSize;
@@ -17,7 +17,7 @@ CounterDisplay::CounterDisplay(C2D_Sprite _icon, int _padding, float _textSize, 
 	if (icon.image.subtex)
 	{
 		size = {
-			(float)icon.image.subtex->width + (digitSize.x * digits) + (padding * 2),
+			(float)icon.image.subtex->width + (digitSize.x * defaultDigits) + (padding * 2),
 			(float)icon.image.subtex->height
 		};
 	}
@@ -34,9 +34,9 @@ void CounterDisplay::update(int _value)
 {
 	valueString = std::to_string(_value);
 	
-	if ((int)valueString.length() < digits)
+	if ((int)valueString.length() < defaultDigits)
 	{
-		valueString = std::string(digits - (int)valueString.length(), '0') + valueString;
+		valueString = std::string(defaultDigits - (int)valueString.length(), '0') + valueString;
 	}
 }
 
@@ -49,7 +49,7 @@ void CounterDisplay::drawBackground()
 		position.x + icon.image.subtex->width + (padding * 2),
 		position.y,
 		0,
-		digitSize.x * digits,
+		digitSize.x * (((int)valueString.length() < defaultDigits) ? defaultDigits : (int)valueString.length()),
 		digitSize.y,
 		C2D_Color32f(1.f, 1.f, 1.f, 0.5f)
 	);

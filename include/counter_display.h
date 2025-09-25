@@ -13,7 +13,7 @@ public:
 	void update(int _value);
 	Vector2f size;
 private:
-	int digits;
+	int defaultDigits;
 	std::string valueString;
 
 	float textSize;

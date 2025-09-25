@@ -13,7 +13,8 @@ ReplayPlayer::ReplayPlayer(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCoun
 	startTime = std::chrono::high_resolution_clock::now();
 	elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
 	movesDone = 0;
-	mineCount = _mineCount;
+	minesPlaced = 0;
+	minesCount = _mineCount;
 }
 
 void ReplayPlayer::start(Score _score)
@@ -37,18 +38,17 @@ void ReplayPlayer::draw()
 		if (movesDone < (int)score.moves.size())
 		{
 			int ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count();
-
+			
 			if (ms >= score.moves[movesDone].ms)
 			{
 				replayMap.placeMine(score.moves[movesDone].position);
-
-				mineCount = mineCount;
+				minesPlaced = 0;
 
 				for (int y = 0; y < dimentions.y; y++)
 				{
 					for (int x = 0; x < dimentions.x; x++)
 					{
-						if (replayMap.playerMap[y][x]) mineCount -= 1;
+						if (replayMap.playerMap[y][x]) minesPlaced += 1;
 					}
 				}
 
@@ -77,8 +77,8 @@ int ReplayPlayer::getTime()
 	else return score.time;
 }
 
-int ReplayPlayer::getMineCount()
+int ReplayPlayer::getMinesPlaced()
 {
-	if (!finished) return mineCount;
-	else return 0;
+	if (!finished) return minesPlaced;
+	else return minesCount;
 }
