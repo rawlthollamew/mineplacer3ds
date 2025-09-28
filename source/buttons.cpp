@@ -53,7 +53,6 @@ void Button::draw()
 
 	C2D_SpriteSetPos(&sprite, position.x, position.y);
 	C2D_DrawSprite(&sprite);
-
 	C2D_DrawText(
 		&text,
 		C2D_WithColor,
