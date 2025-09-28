@@ -6,19 +6,43 @@
 
 #include "utils.h"
 
+enum Screens
+{
+	helpScreen,
+	lbScreen,
+	settingsScreen
+};
+
 class TextPanel
 {
 public:
-	TextPanel(float _textSize);
+	TextPanel();
+	TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigitSize, Vector2f _digitSize);
+	Screens currentScreen;
+	Vector2i selection;
 	void setText();
-	void draw(Vector2i _position);
 	void loadLeaderboardText(std::vector<Score> _scores);
-	bool helpText;
+	void draw(Vector2i _position);
+	void updateSelection(Vector2i _change);
 private:
-	C2D_TextBuf buf;
-	C2D_Text text;
+	C2D_TextBuf previousPageBuf;
+	C2D_TextBuf nextPageBuf;
+	C2D_TextBuf mainBuf;
+	C2D_Text mainText;
+	C2D_Text previousPageText;
+	C2D_Text nextPageText;
+
+	Vector2f halfDigitSize;
+	Vector2f digitSize;
+	
+	C2D_Sprite selectionTopLeft;
+	C2D_Sprite selectionTopRight;
+	C2D_Sprite selectionBottomLeft;
+	C2D_Sprite selectionBottomRight;
+
 	std::string helpString;
 	std::string lbString;
+	std::string settingsString;
 	std::string currentString;
 	float textSize;
 };

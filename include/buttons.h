@@ -22,7 +22,7 @@ public:
 
 	// null as default.
 	C2D_Sprite sprite;
-	C2D_Text text;
+	C2D_Text* text;
 	
 	void initText(std::string _text);
 	void draw();
@@ -32,8 +32,9 @@ public:
 class ButtonHandler
 {
 public:
-	int buttonCount;
-	int selection;
+	int buttonCount = 4;
+	int selection = 0;
+	bool helpText = false;
 
 	C2D_Sprite selectionTopLeft;
 	C2D_Sprite selectionBottomLeft;
@@ -42,14 +43,15 @@ public:
 
 	ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding, float _textSize);
 	void draw();
-	void setVector(bool _helpText);
+	void setVector();
 private:
 	int padding;
 	Vector2i drawPosition;
 
+	Button newGameButton;
 	Button helpButton;
 	Button lbButton;
-	Button newGameButton;
+	Button configButton;
 
 	std::vector<Button> activeButtons;
 };

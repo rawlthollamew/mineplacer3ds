@@ -4,6 +4,7 @@ Button::Button()
 {
 	position = {0,0};
 	color = 0;
+	text = nullptr;
 }
 
 Button::Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _text, float _textSize)
@@ -12,6 +13,12 @@ Button::Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _
 	sprite = _sprite;
 	color = _color;
 	textSize = _textSize;
+	text = nullptr;
+
+	size = {
+		(float)sprite.image.subtex->width,
+		(float)sprite.image.subtex->height
+	};
 
 	initText(_text);
 }
@@ -21,10 +28,10 @@ void Button::initText(std::string _text)
 	Vector2f textDimentions = { 0, 0 };
 	
 	C2D_TextBuf buf = C2D_TextBufNew(4096);
-	C2D_TextParse(&text, buf, _text.c_str());
-	C2D_TextOptimize(&text);
+	C2D_TextParse(text, buf, _text.c_str());
+	C2D_TextOptimize(text);
 	
-	C2D_TextGetDimensions(&text, textSize, textSize, &textDimentions.x, &textDimentions.y);
+	C2D_TextGetDimensions(text, textSize, textSize, &textDimentions.x, &textDimentions.y);
 	
 	size = {
 		(float)sprite.image.subtex->width + textDimentions.x,
@@ -48,25 +55,25 @@ void Button::draw()
 	C2D_SpriteSetPos(&sprite, position.x, position.y);
 	C2D_DrawSprite(&sprite);
 
-	C2D_DrawText(
-		&text,
-		C2D_WithColor,
-		position.x + sprite.image.subtex->width,
-		position.y + ((size.y - textHeight) / 2.f),
-		0,
-		textSize,
-		textSize,
-		C2D_Color32f(1.f,1.f,1.f,1.f)
-	);
+	if (text != nullptr)
+	{
+		C2D_DrawText(
+			text,
+			C2D_WithColor,
+			position.x + sprite.image.subtex->width,
+			position.y + ((size.y - textHeight) / 2.f),
+			0,
+			textSize,
+			textSize,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
+	}
 }
 
 ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding, float _textSize)
 {
 	drawPosition = _drawPosition;
 	padding = _padding;
-
-	buttonCount = 2;
-	selection = 0;
 	
 	u32 backgroundColor = C2D_Color32f(1.f,1.f,1.f,0.5f);
 
@@ -104,6 +111,16 @@ ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int
 	lbButton.color = backgroundColor;
 	lbButton.initText("Scores");
 	lbButton.position = {
+		drawPosition.x + currentSprite.image.subtex->width + padding,
+		drawPosition.y + padding
+	};
+	
+	C2D_SpriteFromSheet(&currentSprite, _sheet, configPng);
+	configButton.textSize = _textSize;
+	configButton.sprite = currentSprite;
+	configButton.color = backgroundColor;
+	configButton.initText("");
+	configButton.position = {
 		drawPosition.x + currentSprite.image.subtex->width + padding,
 		drawPosition.y + padding
 	};
@@ -161,10 +178,11 @@ void ButtonHandler::draw()
 	}
 }
 
-void ButtonHandler::setVector(bool _helpText)
+void ButtonHandler::setVector()
 {
 	activeButtons = {
 		newGameButton,
-		_helpText ? lbButton : helpButton
+		(helpText) ? helpButton : lbButton,
+		configButton
 	};
 }
