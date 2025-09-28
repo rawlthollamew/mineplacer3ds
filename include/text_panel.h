@@ -21,16 +21,14 @@ public:
 	Screens currentScreen;
 	Vector2i selection;
 	void setText();
+	int replayPage = 0;
+	void updatePage(std::vector<Score> _scores, int _change);
 	void loadLeaderboardText(std::vector<Score> _scores);
 	void draw(Vector2i _position);
 	void updateSelection(Vector2i _change);
 private:
-	C2D_TextBuf previousPageBuf;
-	C2D_TextBuf nextPageBuf;
 	C2D_TextBuf mainBuf;
 	C2D_Text mainText;
-	C2D_Text previousPageText;
-	C2D_Text nextPageText;
 
 	Vector2f halfDigitSize;
 	Vector2f digitSize;

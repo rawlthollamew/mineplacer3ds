@@ -82,8 +82,8 @@ int main(int argc, char* argv[])
 		}
 		else if (kDown & KEY_UP) details.textPanel.updateSelection({0, -1});
 		else if (kDown & KEY_DOWN) details.textPanel.updateSelection({0, 1});
-		else if (kDown & KEY_LEFT) details.textPanel.updateSelection({-1, 0});
-		else if (kDown & KEY_RIGHT) details.textPanel.updateSelection({1, 0});
+		else if (kDown & KEY_LEFT) details.textPanel.updatePage(replays.scores, -1);
+		else if (kDown & KEY_RIGHT) details.textPanel.updatePage(replays.scores, 1);
 		else if (kDown & KEY_L)
 		{
 			buttonHandler.selection -= 1;
@@ -120,10 +120,11 @@ int main(int argc, char* argv[])
 		}
 		else if (kDown & KEY_X)
 		{
-			replays.player.start(replays.scores[details.textPanel.selection.y]);
+			int replayIndex = details.textPanel.selection.y + (details.textPanel.replayPage * 8);
+			replays.player.start(replays.scores[replayIndex]);
 			replays.player.playing = !replays.player.playing;
 			replays.player.finished = false;
-			if (replays.player.playing) details.initReplayText(replays.scores[details.textPanel.selection.y].time, replays.scores[details.textPanel.selection.y].username);
+			if (replays.player.playing) details.initReplayText(replays.scores[replayIndex].time, replays.scores[replayIndex].username);
 		}
 		
 		details.replayMode = replays.player.playing;

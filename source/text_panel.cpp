@@ -14,11 +14,6 @@ TextPanel::TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigi
 	mainBuf = C2D_TextBufNew(4096);
 	mainText = {0};
 
-	nextPageBuf = C2D_TextBufNew(128);
-	previousPageBuf = C2D_TextBufNew(128);
-	C2D_TextParse(&nextPageText, nextPageBuf, "Next page ->");
-	C2D_TextParse(&previousPageText, previousPageBuf, "<- Previous page");
-
 	helpString =
 		"How to play: \n"
 		"        Place down mines using the touch controls.\n"
@@ -52,19 +47,32 @@ TextPanel::TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigi
 	C2D_SpriteFromSheet(&selectionBottomRight, _sheet, selectionBottomRightPng);
 }
 
+void TextPanel::updatePage(std::vector<Score> _scores, int _change)
+{
+	int newValue = replayPage + _change;
+	
+	if (newValue < 0) return;
+	if (newValue > (int)(_scores.size() / 8)) return;
+
+	replayPage = newValue;
+	loadLeaderboardText(_scores);
+}
+
 void TextPanel::loadLeaderboardText(std::vector<Score> _scores)
 {
 	lbString =
 		"Leaderboard: \n"
-		"        Press up/down/left/right to go through scores\n"
+		"        Press up/down to go through scores\n"
+		"        Press left/right to go through pages\n"
 		"        Press  to watch replay\n\n";
 
 	// max of 8 items on the lb.
 	// get the minimum between 8 and number of scores there are.
-	for (int i = 0; i < (int)std::min((size_t)8, _scores.size()); i++)
+	for (int i = replayPage * 8; i < (int)std::min((size_t)(replayPage * 8) + 8, _scores.size()); i++)
 	{
 		lbString = lbString + std::to_string(i + 1) + ": " + _scores[i].username + "(" + std::to_string(_scores[i].time) + ")\n";
 	}
+
 	
 	setText();
 }
@@ -90,9 +98,8 @@ void TextPanel::updateSelection(Vector2i _change)
 	if (finalChange.x < 0) finalChange.x = 0;
 	if (finalChange.y < 0) finalChange.y = 0;
 
-	if (currentScreen == lbScreen && finalChange.y != 8) finalChange.x = 0;
 	if (currentScreen == lbScreen && finalChange.x > 1) return;
-	if (currentScreen == lbScreen && finalChange.y > 8) return;
+	if (currentScreen == lbScreen && finalChange.y > 7) return;
 	
 	if (currentScreen == helpScreen && finalChange.x > 2) return;
 	if (currentScreen == helpScreen && finalChange.y > 0) return;
@@ -121,7 +128,7 @@ void TextPanel::draw(Vector2i _position)
 		};
 		Vector2f selectionBoxPosition = {
 			selection.x * (selectionBoxSize.x / 2.f),
-			halfDigitSize.y * (selection.y + 4) + _position.y
+			halfDigitSize.y * (selection.y + 5) + _position.y
 		};
 
 		C2D_SpriteSetPos(
@@ -147,43 +154,6 @@ void TextPanel::draw(Vector2i _position)
 			selectionBoxPosition.x + selectionBoxSize.x,
 			selectionBoxPosition.y + selectionBoxSize.y
 		);
-		
-
-		C2D_DrawText(
-			&previousPageText,
-			C2D_WithColor,
-			(topScreen.x / 8.f),
-			topScreen.y - 50,
-			0,
-			textSize,
-			textSize,
-			C2D_Color32f(1.f, 1.f, 1.f, 1.f)
-		);
-
-		C2D_DrawText(
-			&nextPageText,
-			C2D_WithColor | C2D_AlignRight,
-			topScreen.x - (topScreen.x / 8.f),
-			topScreen.y - 50,
-			0,
-			textSize,
-			textSize,
-			C2D_Color32f(1.f, 1.f, 1.f, 1.f)
-		);
-
-		if (selection.y == 8)
-		{
-			C2D_SpriteMove(
-				&selectionTopRight,
-				-selectionBoxSize.x / 2.f,
-				0
-			);
-			C2D_SpriteMove(
-				&selectionBottomRight,
-				-selectionBoxSize.x / 2.f,
-				0
-			);
-		}
 
 		C2D_DrawSprite(&selectionTopLeft);
 		C2D_DrawSprite(&selectionBottomLeft);
