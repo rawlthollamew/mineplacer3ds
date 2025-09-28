@@ -4,6 +4,7 @@ Button::Button()
 {
 	position = {0,0};
 	color = 0;
+	text = nullptr;
 }
 
 Button::Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _text, float _textSize)
@@ -12,7 +13,11 @@ Button::Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _
 	sprite = _sprite;
 	color = _color;
 	textSize = _textSize;
+<<<<<<< HEAD
 	buf = C2D_TextBufNew(256);
+=======
+	text = nullptr;
+>>>>>>> 2ed1276f2c574f068584b62e8a8ff262b5fb6dbb
 
 	size = {
 		(float)sprite.image.subtex->width,
@@ -27,10 +32,10 @@ void Button::initText(std::string _text)
 	Vector2f textDimentions = { 0, 0 };
 	
 	C2D_TextBuf buf = C2D_TextBufNew(4096);
-	C2D_TextParse(&text, buf, _text.c_str());
-	C2D_TextOptimize(&text);
+	C2D_TextParse(text, buf, _text.c_str());
+	C2D_TextOptimize(text);
 	
-	C2D_TextGetDimensions(&text, textSize, textSize, &textDimentions.x, &textDimentions.y);
+	C2D_TextGetDimensions(text, textSize, textSize, &textDimentions.x, &textDimentions.y);
 	
 	size = {
 		(float)sprite.image.subtex->width + textDimentions.x,
@@ -54,16 +59,19 @@ void Button::draw()
 	C2D_SpriteSetPos(&sprite, position.x, position.y);
 	C2D_DrawSprite(&sprite);
 
-	C2D_DrawText(
-		&text,
-		C2D_WithColor,
-		position.x + sprite.image.subtex->width,
-		position.y + ((size.y - textHeight) / 2.f),
-		0,
-		textSize,
-		textSize,
-		C2D_Color32f(1.f,1.f,1.f,1.f)
-	);
+	if (text != nullptr)
+	{
+		C2D_DrawText(
+			text,
+			C2D_WithColor,
+			position.x + sprite.image.subtex->width,
+			position.y + ((size.y - textHeight) / 2.f),
+			0,
+			textSize,
+			textSize,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
+	}
 }
 
 ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding, float _textSize)
