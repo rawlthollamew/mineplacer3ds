@@ -120,11 +120,14 @@ int main(int argc, char* argv[])
 		}
 		else if (kDown & KEY_X)
 		{
-			int replayIndex = details.textPanel.selection.y + (details.textPanel.replayPage * 8);
-			replays.player.start(replays.scores[replayIndex]);
-			replays.player.playing = !replays.player.playing;
-			replays.player.finished = false;
-			if (replays.player.playing) details.initReplayText(replays.scores[replayIndex].time, replays.scores[replayIndex].username);
+			if (replays.scores.size() > 0)
+			{
+				int replayIndex = details.textPanel.selection.y + (details.textPanel.replayPage * 8);
+				replays.player.start(replays.scores[replayIndex]);
+				replays.player.playing = !replays.player.playing;
+				replays.player.finished = false;
+				if (replays.player.playing) details.initReplayText(replays.scores[replayIndex].time, replays.scores[replayIndex].username);
+			}
 		}
 		
 		details.replayMode = replays.player.playing;

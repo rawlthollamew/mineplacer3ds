@@ -52,7 +52,7 @@ void TextPanel::updatePage(std::vector<Score> _scores, int _change)
 	int newValue = replayPage + _change;
 	
 	if (newValue < 0) return;
-	if (newValue > (int)(_scores.size() / 8)) return;
+	if (newValue > (int)((_scores.size() - 1) / 8)) return;
 
 	replayPage = newValue;
 	loadLeaderboardText(_scores);
@@ -68,9 +68,16 @@ void TextPanel::loadLeaderboardText(std::vector<Score> _scores)
 
 	// max of 8 items on the lb.
 	// get the minimum between 8 and number of scores there are.
-	for (int i = replayPage * 8; i < (int)std::min((size_t)(replayPage * 8) + 8, _scores.size()); i++)
+	if (_scores.size() > 0)
 	{
-		lbString = lbString + std::to_string(i + 1) + ": " + _scores[i].username + "(" + std::to_string(_scores[i].time) + ")\n";
+		for (int i = replayPage * 8; i < (int)std::min((size_t)(replayPage * 8) + 8, _scores.size()); i++)
+		{
+			lbString = lbString + std::to_string(i + 1) + ": " + _scores[i].username + "(" + std::to_string(_scores[i].time) + ")\n";
+		}
+	}
+	else if (_scores.size() == 0)
+	{
+		lbString += "No scores here. Try setting some!";
 	}
 
 	
