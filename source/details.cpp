@@ -1,24 +1,19 @@
 #include "details.h"
 
 Details::Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions, float _textSize)
-	: textPanel(_textSize / 2.f), mineCount(_mineCount)
+	: mineCount(_mineCount)
 {
 	C2D_SpriteFromSheet(&mineSprite, _sheet, flagPng);
 	C2D_SpriteFromSheet(&timeSprite, _sheet, clockPng);
-
-	C2D_SpriteFromSheet(&selectionTopLeft, _sheet, selectionTopLeftPng);
-	C2D_SpriteFromSheet(&selectionBottomLeft, _sheet, selectionBottomLeftPng);
-	C2D_SpriteFromSheet(&selectionTopRight, _sheet, selectionTopRightPng);
-	C2D_SpriteFromSheet(&selectionBottomRight, _sheet, selectionBottomRightPng);
 
 	replayBuf = C2D_TextBufNew(256);
 	
 	infoPadding = mineSprite.image.subtex->width / 4;
 	infoPosition = {0, topScreen.y - mineSprite.image.subtex->height - (infoPadding * 2)};
 	infoSize = {topScreen.x, mineSprite.image.subtex->height + (infoPadding * 2)};
-
+	
 	C2D_Text digitText;
-	C2D_TextBuf digitBuf = C2D_TextBufNew(256);
+	C2D_TextBuf digitBuf = C2D_TextBufNew(64);
 	
 	digitSize = {0, 0};
 	halfDigitSize = {0, 0};
@@ -26,11 +21,15 @@ Details::Details(C2D_SpriteSheet _sheet, int _mineCount, Vector2i _dimentions, f
 	C2D_TextParse(&digitText, digitBuf, "0");
 	C2D_TextGetDimensions(&digitText, 1.f, 1.f, &digitSize.x, &digitSize.y);
 	C2D_TextGetDimensions(&digitText, 0.5f, 0.5f, &halfDigitSize.x, &halfDigitSize.y);
+
+	C2D_TextBufDelete(digitBuf);
 	
 	mines = CounterDisplay(mineSprite, infoPadding, _textSize, digitSize, 2, {0, infoPosition.y});
 	times = CounterDisplay(timeSprite, infoPadding, _textSize, digitSize, 2, {(int)mines.size.x, infoPosition.y});
 	infoColor = C2D_Color32f(1.f,1.f,1.f,0.5f);
 	replayMode = false;
+
+	textPanel = TextPanel(_textSize / 2.f, _sheet, halfDigitSize, digitSize);
 
 	initReplayText(0, "");
 }
@@ -99,47 +98,6 @@ void Details::draw()
 
 		C2D_TextBufClear(replayBuf);
 	}
-}
-
-void Details::drawSelection(int _selection)
-{
-	Vector2f selectionBoxSize = {
-		(float)(topScreen.x),
-		halfDigitSize.y * 2
-	};
-	Vector2f selectionBoxPosition = {
-		0,
-		halfDigitSize.y * (_selection + 4) + infoPadding
-	};
-
-	C2D_SpriteSetPos(
-		&selectionTopLeft,
-		selectionBoxPosition.x,
-		selectionBoxPosition.y
-	);
-
-	C2D_SpriteSetPos(
-		&selectionBottomLeft,
-		selectionBoxPosition.x,
-		selectionBoxPosition.y + selectionBoxSize.y - halfDigitSize.y
-	);
-
-	C2D_SpriteSetPos(
-		&selectionTopRight,
-		selectionBoxPosition.x + selectionBoxSize.x - halfDigitSize.x,
-		selectionBoxPosition.y
-	);
-
-	C2D_SpriteSetPos(
-		&selectionBottomRight,
-		selectionBoxPosition.x + selectionBoxSize.x - halfDigitSize.x,
-		selectionBoxPosition.y + selectionBoxSize.y - halfDigitSize.y
-	);
-
-	C2D_DrawSprite(&selectionTopLeft);
-	C2D_DrawSprite(&selectionBottomLeft);
-	C2D_DrawSprite(&selectionTopRight);
-	C2D_DrawSprite(&selectionBottomRight);
 }
 
 void Details::update(u32 _color, int _minesRemaining, int _currentTime)

@@ -41,10 +41,9 @@ int main(int argc, char* argv[])
 
 	Timer timer;
 
-	buttonHandler.setVector(details.textPanel.helpText);
+	buttonHandler.setVector();
 	bool submittedTime = false;
 	bool completed = maps.mapCompleted();
-	int replaySelection = 0;
 	
 	while (aptMainLoop())
 	{
@@ -81,17 +80,10 @@ int main(int argc, char* argv[])
 			maps.placeMine(mapPosition);
 			replays.recorder.update(mapPosition);
 		}
-		else if (kDown & KEY_UP)
-		{
-			replaySelection -= 1;
-			if (replaySelection < 0) replaySelection = 0;
-		}
-		else if (kDown & KEY_DOWN)
-		{
-			// lb has a max size of 8.
-			replaySelection += 1;
-			if (replaySelection >= (int)std::min((size_t)8, replays.scores.size())) replaySelection = std::min((size_t)8, replays.scores.size()) - 1;
-		}
+		else if (kDown & KEY_UP) details.textPanel.updateSelection({0, -1});
+		else if (kDown & KEY_DOWN) details.textPanel.updateSelection({0, 1});
+		else if (kDown & KEY_LEFT) details.textPanel.updateSelection({-1, 0});
+		else if (kDown & KEY_RIGHT) details.textPanel.updateSelection({1, 0});
 		else if (kDown & KEY_L)
 		{
 			buttonHandler.selection -= 1;
@@ -114,16 +106,24 @@ int main(int argc, char* argv[])
 			}
 			else if (buttonHandler.selection == 1)
 			{
-				details.textPanel.helpText = !details.textPanel.helpText;
+				buttonHandler.helpText = !buttonHandler.helpText;
+				buttonHandler.setVector();
+				if (buttonHandler.helpText) details.textPanel.currentScreen = lbScreen;
+				else if (!buttonHandler.helpText) details.textPanel.currentScreen = helpScreen;
 				details.textPanel.setText();
-				buttonHandler.setVector(details.textPanel.helpText);
+			}
+			else if (buttonHandler.selection == 2)
+			{
+				details.textPanel.currentScreen = settingsScreen;
+				details.textPanel.setText();
 			}
 		}
 		else if (kDown & KEY_X)
 		{
-			replays.player.start(replays.scores[replaySelection]);
+			replays.player.start(replays.scores[details.textPanel.selection.y]);
 			replays.player.playing = !replays.player.playing;
-			if (replays.player.playing) details.initReplayText(replays.scores[replaySelection].time, replays.scores[replaySelection].username);
+			replays.player.finished = false;
+			if (replays.player.playing) details.initReplayText(replays.scores[details.textPanel.selection.y].time, replays.scores[details.textPanel.selection.y].username);
 		}
 		
 		details.replayMode = replays.player.playing;
@@ -137,7 +137,6 @@ int main(int argc, char* argv[])
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C2D_TargetClear(top, clrBlack);
 			C2D_SceneBegin(top);
-			if (!details.textPanel.helpText) details.drawSelection(replaySelection);
 			details.draw();
 			buttonHandler.draw();
 			

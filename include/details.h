@@ -22,7 +22,6 @@ public:
 
 	void update(u32 _color, int _minesPlaced, int _currentTime);
 	void draw();
-	void drawSelection(int _selection);
 
 	TextPanel textPanel;
 	Vector2i getInfoPosition() { return infoPosition; }
@@ -42,11 +41,6 @@ private:
 
 	C2D_Text replayText;
 	C2D_TextBuf replayBuf;
-
-	C2D_Sprite selectionTopLeft;
-	C2D_Sprite selectionBottomLeft;
-	C2D_Sprite selectionTopRight;
-	C2D_Sprite selectionBottomRight;
 	
 	int infoPadding;
 	int mineCount;

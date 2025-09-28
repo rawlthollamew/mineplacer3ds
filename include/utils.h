@@ -21,7 +21,8 @@ enum PngOrder
 	selectionTopLeftPng,
 	selectionBottomLeftPng,
 	selectionTopRightPng,
-	selectionBottomRightPng
+	selectionBottomRightPng,
+	configPng
 };
 
 struct Vector2f
