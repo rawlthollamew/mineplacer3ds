@@ -1,31 +1,31 @@
 #include "settings.h"
 
+Difficulty Settings::easyDiff = {
+    1.5f,
+    40,
+    10,
+    {bottomScreen.x / 40, bottomScreen.y / 40},
+    2.f
+};
 
-Settings::Settings()
-{
-	int mainTileSize = 20;
-	int doubleTileSize = mainTileSize * 2;
+Difficulty Settings::mediumDiff = {
+    1.f,
+    20,
+    50,
+    {bottomScreen.x / 20, bottomScreen.y / 20},
+    1.f
+};
 
-	Difficulty newDifficulty;
+Difficulty Settings::hardDiff = {
+    1.f,
+    20,
+    75,
+    {bottomScreen.x / 20, bottomScreen.y / 20},
+    1.f
+};
 
-	newDifficulty.tileSize = doubleTileSize;
-	newDifficulty.mineCount = 10;
-	newDifficulty.dimentions = { bottomScreen.x / doubleTileSize, bottomScreen.y / doubleTileSize };
-	newDifficulty.textSize = 2.f;
-	newDifficulty.scaling = 2.f;
-	diffs.push_back(newDifficulty);
-	
-	newDifficulty.tileSize = mainTileSize;
-	newDifficulty.mineCount = 50;
-	newDifficulty.dimentions = { bottomScreen.x / mainTileSize, bottomScreen.y / mainTileSize };
-	newDifficulty.textSize = 1.f;
-	newDifficulty.scaling = 1.f;
-	diffs.push_back(newDifficulty);
-	
-	newDifficulty.tileSize = mainTileSize;
-	newDifficulty.mineCount = 75;
-	newDifficulty.dimentions = { bottomScreen.x / mainTileSize, bottomScreen.y / mainTileSize };
-	newDifficulty.textSize = 1.f;
-	newDifficulty.scaling = 1.f;
-	diffs.push_back(newDifficulty);
-}
+std::vector<Difficulty> Settings::diffs = {
+    easyDiff,
+    mediumDiff,
+    hardDiff
+};

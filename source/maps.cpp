@@ -123,17 +123,35 @@ void Maps::draw()
 			}
 			else if (generatedMap[y][x] > 0)
 			{
-				Vector2f textDimentions = { 0.f, 0.f };
-				snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
-				C2D_TextParse(&dynamicText, textBuffer, buf);
-				C2D_TextGetDimensions(&dynamicText, textSize, textSize, &textDimentions.x, &textDimentions.y);
-
-				Vector2f textPosition = {
-					x * tileSize + (textDimentions.x  / 2.f),
-					y * tileSize
-				};
-				C2D_TextOptimize(&dynamicText);
-				C2D_DrawText(&dynamicText, C2D_WithColor | C2D_AlignCenter | C2D_AlignJustified, textPosition.x, textPosition.y, 0.f, textSize, textSize, currentTileColor);
+				if (playerMap[y][x] == true)
+				{
+					float mineTextSize = textSize / 1.5f;
+					Vector2f textDimentions = { 0.f, 0.f };
+					snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
+					C2D_TextParse(&dynamicText, textBuffer, buf);
+					C2D_TextGetDimensions(&dynamicText, mineTextSize, mineTextSize, &textDimentions.x, &textDimentions.y);
+	
+					Vector2f textPosition = {
+						x * tileSize + (textDimentions.x  / 2.f) + (tileSize / 3.f),
+						(float)(y * tileSize) + (tileSize / 3.f)
+					};
+					C2D_TextOptimize(&dynamicText);
+					C2D_DrawText(&dynamicText, C2D_WithColor | C2D_AlignCenter | C2D_AlignJustified, textPosition.x, textPosition.y, 0.f, mineTextSize, mineTextSize, currentTileColor);
+				}
+				else
+				{
+					Vector2f textDimentions = { 0.f, 0.f };
+					snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
+					C2D_TextParse(&dynamicText, textBuffer, buf);
+					C2D_TextGetDimensions(&dynamicText, textSize, textSize, &textDimentions.x, &textDimentions.y);
+	
+					Vector2f textPosition = {
+						x * tileSize + (textDimentions.x  / 2.f),
+						(float)(y * tileSize)
+					};
+					C2D_TextOptimize(&dynamicText);
+					C2D_DrawText(&dynamicText, C2D_WithColor | C2D_AlignCenter | C2D_AlignJustified, textPosition.x, textPosition.y, 0.f, textSize, textSize, currentTileColor);
+				}
 			}
 			
 			// if (mineMap[y][x]) C2D_DrawRectSolid(x * tileSize, y * tileSize, 0, tileSize, tileSize, C2D_Color32f(0.f,1.f,1.f,0.5f));

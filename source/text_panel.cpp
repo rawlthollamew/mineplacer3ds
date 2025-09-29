@@ -112,7 +112,8 @@ void TextPanel::updateSelection(std::vector<Score> _scores, Vector2i _change)
 		if (finalChange.y != 8) finalChange.x = 0;
 		if (finalChange.x > 1) return;
 		if (finalChange.y > 7) return;
-		if (replayPage == (int)((_scores.size() - 1) / 8) && finalChange.y > (_scores.size() - 1) - (replayPage * 8)) finalChange.y = (_scores.size() - 1) - (replayPage * 8);
+		// means that out of bounds not allowed.
+		if (replayPage == (int)((_scores.size() - 1) / 8) && finalChange.y > ((int)_scores.size() - 1) - (replayPage * 8)) finalChange.y = ((int)_scores.size() - 1) - (replayPage * 8);
 	}
 	
 	if (currentScreen == helpScreen && finalChange.x > 2) return;

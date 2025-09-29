@@ -4,7 +4,7 @@ ReplayManager::ReplayManager(C2D_SpriteSheet& _sheet, Difficulty _difficulty, st
 	: player(_sheet, _difficulty), directory(_directory)
 {
 	mkdir(_directory.c_str(), 0777);
-	getScores();
+	getScores(_difficulty);
 }
 
 std::string ReplayManager::playerInput(int _finalTime)
@@ -45,6 +45,16 @@ std::string ReplayManager::playerInput(int _finalTime)
 	return std::string(buf);
 }
 
+std::string ReplayManager::diffToString(Difficulty _difficulty)
+{
+	if (_difficulty.mineCount == Settings::easyDiff.mineCount &&
+		_difficulty.dimentions == Settings::easyDiff.dimentions) return "easy";
+	else if (_difficulty.mineCount == Settings::mediumDiff.mineCount && 
+		_difficulty.dimentions == Settings::mediumDiff.dimentions) return "medium";
+	else if (_difficulty.mineCount == Settings::hardDiff.mineCount &&
+		_difficulty.dimentions == Settings::hardDiff.dimentions) return "hard";
+	else return "custom";
+}
 
 std::string ReplayManager::epochToDate(time_t _epoch)
 {
@@ -54,7 +64,7 @@ std::string ReplayManager::epochToDate(time_t _epoch)
 	return result;
 }
 
-void ReplayManager::saveReplay(std::vector<Move> _moves, std::vector<std::vector<bool>> _map, int _finalTime)
+void ReplayManager::saveReplay(std::vector<Move> _moves, std::vector<std::vector<bool>> _map, int _finalTime, Difficulty _difficulty)
 {
 	json_t* root = json_object();
 	json_t* map = json_array();
@@ -62,6 +72,21 @@ void ReplayManager::saveReplay(std::vector<Move> _moves, std::vector<std::vector
 
 	json_object_set_new(root, "username", json_string(username.c_str()));
 	json_object_set_new(root, "time", json_integer(_finalTime));
+
+	json_t* difficulty = json_object();
+	json_t* dimentions = json_array();
+	
+	json_object_set_new(difficulty, "textSize", json_real(_difficulty.textSize));
+	json_object_set_new(difficulty, "tileSize", json_integer(_difficulty.tileSize));
+	json_object_set_new(difficulty, "mineCount", json_integer(_difficulty.mineCount));
+
+	json_array_append_new(dimentions, json_integer(_difficulty.dimentions.x));
+	json_array_append_new(dimentions, json_integer(_difficulty.dimentions.y));
+	json_object_set_new(difficulty, "dimentions", dimentions);
+	
+	json_object_set_new(difficulty, "scaling", json_real(_difficulty.scaling));
+
+	json_object_set_new(root, "difficulty", difficulty);
 
 	for (int y = 0; y < (int)_map.size(); y++)
 	{
@@ -89,13 +114,13 @@ void ReplayManager::saveReplay(std::vector<Move> _moves, std::vector<std::vector
 	}
 	json_object_set_new(root, "moves", moves);
 
-	std::string filename = directory + std::to_string(_finalTime) + " - " + epochToDate(time(0)) + ".json";
+	std::string filename = directory + diffToString(_difficulty) + " - "+ std::to_string(_finalTime) + " - " + epochToDate(time(0)) + ".json";
 
 	json_dump_file(root, filename.c_str(), JSON_INDENT(4));
 	json_decref(root);
 }
 
-void ReplayManager::getScores()
+void ReplayManager::getScores(Difficulty _difficulty)
 {
 	scores.clear();
 	DIR* replaysDir = opendir(directory.c_str());
@@ -118,6 +143,18 @@ void ReplayManager::getScores()
 			Score newScore;
 			newScore.username = json_string_value(json_object_get(root, "username"));
 			newScore.time = (int)json_integer_value(json_object_get(root, "time"));
+
+			json_t* diffJson = json_object_get(root, "difficulty");
+			newScore.difficulty.textSize = (float)json_real_value(json_object_get(diffJson, "textSize"));
+			newScore.difficulty.tileSize = (int)json_integer_value(json_object_get(diffJson, "tileSize"));
+			newScore.difficulty.mineCount = (int)json_integer_value(json_object_get(diffJson, "mineCount"));
+			newScore.difficulty.scaling = (float)json_real_value(json_object_get(diffJson, "scaling"));
+			newScore.difficulty.dimentions = {
+				(int)json_integer_value(json_array_get(json_object_get(diffJson, "dimentions"), 0)),
+				(int)json_integer_value(json_array_get(json_object_get(diffJson, "dimentions"), 1))
+			};
+
+			if (newScore.difficulty.mineCount != _difficulty.mineCount || newScore.difficulty.dimentions != _difficulty.dimentions) continue;
 			
 			json_t* movesNode = json_object_get(root, "moves");
 			json_t* mapNode = json_object_get(root, "map");

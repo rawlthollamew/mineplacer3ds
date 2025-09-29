@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 	u32 clrBlack = C2D_Color32f(0.f, 0.f, 0.f, 0.f);
 	C2D_SpriteSheet sheet = C2D_SpriteSheetLoad("romfs:/gfx/textures.t3x");
 	
-	Settings settings;
-	Difficulty currentDifficulty = settings.diffs[settings.current];
+	int currentDiff = 0;
+	Difficulty currentDifficulty = Settings::diffs[currentDiff];
 
 	Maps maps(sheet, currentDifficulty);
 	maps.generate();
@@ -55,9 +55,9 @@ int main(int argc, char* argv[])
 
 			if (!submittedTime)
 			{
-				replays.saveReplay(replays.recorder.getMoves(), maps.mineMap, timer.getTime());
+				replays.saveReplay(replays.recorder.getMoves(), maps.mineMap, timer.getTime(), currentDifficulty);
 
-				replays.getScores();
+				replays.getScores(currentDifficulty);
 				details.textPanel.loadLeaderboardText(replays.scores);				
 				submittedTime = true;
 			}

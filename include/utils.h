@@ -37,6 +37,15 @@ struct Vector2i
 	int y;
 };
 
+inline bool operator==(Vector2i& _a, Vector2i& _b)
+{
+	return _a.x == _b.x && _a.y == _b.y;
+}
+inline bool operator!=(Vector2i& _a, Vector2i& _b)
+{
+	return _a.x != _b.x || _a.y != _b.y;
+}
+
 const Vector2i topScreen = {400, 240};
 const Vector2i bottomScreen = {320, 240};
 
@@ -45,16 +54,6 @@ struct Move
 	int ms;
 	Vector2i position;
 };
-
-struct Score
-{
-	std::string username;
-	int time;
-
-	std::vector<Move> moves;
-	std::vector<std::vector<bool>> mineMap;
-};
-
 struct Difficulty
 {
 	float textSize;
@@ -62,4 +61,14 @@ struct Difficulty
 	int mineCount;
 	Vector2i dimentions;
 	float scaling;
+};
+
+struct Score
+{
+	std::string username;
+	int time;
+
+	std::vector<Move> moves;
+	Difficulty difficulty;
+	std::vector<std::vector<bool>> mineMap;
 };

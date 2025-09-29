@@ -8,8 +8,8 @@
 class Settings
 {
 public:
-	int current = 0;
-	int dificultyCount = 3;
-	Settings();
-	std::vector<Difficulty> diffs;
+	static std::vector<Difficulty> diffs;
+	static Difficulty easyDiff;
+	static Difficulty mediumDiff;
+	static Difficulty hardDiff;
 };
