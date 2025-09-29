@@ -32,11 +32,16 @@ TextPanel::TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigi
 		"        Press left/right to go through pages\n"
 		"        Press  to watch replay\n\n";
 	
-	settingsString =
-		"Settings: \n"
-		"        Width: \n\n"
-		"        Height: \n\n"
-		"        Mine Count: \n\n";
+	easyDiffBuf = C2D_TextBufNew(256);
+	mediumDiffBuf = C2D_TextBufNew(256);
+	hardDiffBuf = C2D_TextBufNew(256);
+
+	C2D_TextParse(&easyDiffText, easyDiffBuf, "Easy");
+	C2D_TextParse(&mediumDiffText, mediumDiffBuf, "Medium");
+	C2D_TextParse(&hardDiffText, hardDiffBuf, "Hard");
+	C2D_TextOptimize(&easyDiffText);
+	C2D_TextOptimize(&mediumDiffText);
+	C2D_TextOptimize(&hardDiffText);
 
 	currentString = helpString;
 	setText();
@@ -88,7 +93,6 @@ void TextPanel::setText()
 {
 	if (currentScreen == helpScreen) currentString = helpString;
 	else if (currentScreen == lbScreen) currentString = lbString;
-	else if (currentScreen == settingsScreen) currentString = settingsString;
 
 	C2D_TextBufClear(mainBuf);
 	C2D_TextParse(&mainText, mainBuf, currentString.c_str());
@@ -177,8 +181,39 @@ void TextPanel::draw(Vector2i _position)
 	}
 	else if (currentScreen == helpScreen)
 	{
+		C2D_DrawText(
+			&easyDiffText,
+			C2D_WithColor,
+			topScreen.x / 6.f,
+			topScreen.y - (digitSize.y * 2),
+			0,
+			0.5f,
+			0.5f,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
+		C2D_DrawText(
+			&mediumDiffText,
+			C2D_WithColor | C2D_AlignCenter,
+			topScreen.x / 2.f,
+			topScreen.y - (digitSize.y * 2),
+			0,
+			0.5f,
+			0.5f,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
+		C2D_DrawText(
+			&hardDiffText,
+			C2D_WithColor | C2D_AlignRight,
+			topScreen.x - (topScreen.x / 6.f),
+			topScreen.y - (digitSize.y * 2),
+			0,
+			0.5f,
+			0.5f,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
+
 		Vector2f selectionBoxSize = {
-			(float)(topScreen.x) / 3.f,
+			(float)(topScreen.x / 3.f) - selectionTopLeft.image.subtex->width,
 			halfDigitSize.y
 		};
 		Vector2f selectionBoxPosition = {

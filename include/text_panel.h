@@ -9,8 +9,7 @@
 enum Screens
 {
 	helpScreen,
-	lbScreen,
-	settingsScreen
+	lbScreen
 };
 
 class TextPanel
@@ -30,6 +29,13 @@ private:
 	C2D_TextBuf mainBuf;
 	C2D_Text mainText;
 
+	C2D_TextBuf easyDiffBuf;
+	C2D_Text easyDiffText;
+	C2D_TextBuf mediumDiffBuf;
+	C2D_Text mediumDiffText;
+	C2D_TextBuf hardDiffBuf;
+	C2D_Text hardDiffText;
+
 	Vector2f halfDigitSize;
 	Vector2f digitSize;
 	
@@ -40,7 +46,6 @@ private:
 
 	std::string helpString;
 	std::string lbString;
-	std::string settingsString;
 	std::string currentString;
 	float textSize;
 };

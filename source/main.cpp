@@ -27,8 +27,7 @@ int main(int argc, char* argv[])
 	u32 clrBlack = C2D_Color32f(0.f, 0.f, 0.f, 0.f);
 	C2D_SpriteSheet sheet = C2D_SpriteSheetLoad("romfs:/gfx/textures.t3x");
 	
-	int currentDiff = 0;
-	Difficulty currentDifficulty = Settings::diffs[currentDiff];
+	Difficulty currentDifficulty = Settings::diffs[0];
 
 	Maps maps(sheet, currentDifficulty);
 	maps.generate();
@@ -112,21 +111,23 @@ int main(int argc, char* argv[])
 				else if (!buttonHandler.helpText) details.textPanel.currentScreen = helpScreen;
 				details.textPanel.setText();
 			}
-			else if (buttonHandler.selection == 2)
-			{
-				details.textPanel.currentScreen = settingsScreen;
-				details.textPanel.setText();
-			}
 		}
 		else if (kDown & KEY_X)
 		{
-			if (replays.scores.size() > 0)
+			if (details.textPanel.currentScreen == lbScreen && replays.scores.size() > 0)
 			{
 				int replayIndex = details.textPanel.selection.y + (details.textPanel.replayPage * 8);
 				replays.player.start(replays.scores[replayIndex]);
 				replays.player.playing = !replays.player.playing;
 				replays.player.finished = false;
 				if (replays.player.playing) details.initReplayText(replays.scores[replayIndex].time, replays.scores[replayIndex].username);
+			}
+			else if (details.textPanel.currentScreen == helpScreen)
+			{
+				currentDifficulty = Settings::diffs[details.textPanel.selection.x];
+				maps = Maps(sheet, currentDifficulty);
+				maps.generate();
+				replays.getScores(currentDifficulty);
 			}
 		}
 		

@@ -33,7 +33,7 @@ public:
 class ButtonHandler
 {
 public:
-	int buttonCount = 3;
+	int buttonCount = 2;
 	int selection = 0;
 	bool helpText = false;
 
@@ -52,7 +52,6 @@ private:
 	Button newGameButton;
 	Button helpButton;
 	Button lbButton;
-	Button configButton;
 
 	std::vector<Button> activeButtons;
 };

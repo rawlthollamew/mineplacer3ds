@@ -109,16 +109,6 @@ ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int
 		drawPosition.x + currentSprite.image.subtex->width + padding,
 		drawPosition.y + padding
 	};
-	
-	C2D_SpriteFromSheet(&currentSprite, _sheet, configPng);
-	configButton.textSize = _textSize;
-	configButton.sprite = currentSprite;
-	configButton.color = backgroundColor;
-	configButton.initText("");
-	configButton.position = {
-		drawPosition.x + currentSprite.image.subtex->width + padding,
-		drawPosition.y + padding
-	};
 }
 
 
@@ -177,7 +167,6 @@ void ButtonHandler::setVector()
 {
 	activeButtons = {
 		newGameButton,
-		(helpText) ? helpButton : lbButton,
-		configButton
+		(helpText) ? helpButton : lbButton
 	};
 }

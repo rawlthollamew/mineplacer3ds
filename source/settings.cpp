@@ -9,7 +9,7 @@ Difficulty Settings::easyDiff = {
 };
 
 Difficulty Settings::mediumDiff = {
-    1.f,
+    0.75f,
     20,
     50,
     {bottomScreen.x / 20, bottomScreen.y / 20},
@@ -17,7 +17,7 @@ Difficulty Settings::mediumDiff = {
 };
 
 Difficulty Settings::hardDiff = {
-    1.f,
+    0.75f,
     20,
     75,
     {bottomScreen.x / 20, bottomScreen.y / 20},
