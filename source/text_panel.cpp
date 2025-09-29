@@ -28,9 +28,10 @@ TextPanel::TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigi
 
 	lbString =
 		"Leaderboard: \n"
-		"        Press up/down/left/right to go through scores\n"
+		"        Press up/down to go through scores\n"
+		"        Press left/right to go through pages\n"
 		"        Press  to watch replay\n\n";
-
+	
 	settingsString =
 		"Settings: \n"
 		"        Width: \n\n"
@@ -80,7 +81,6 @@ void TextPanel::loadLeaderboardText(std::vector<Score> _scores)
 		lbString += "No scores here. Try setting some!";
 	}
 
-	
 	setText();
 }
 
@@ -95,7 +95,7 @@ void TextPanel::setText()
 	C2D_TextOptimize(&mainText);
 }
 
-void TextPanel::updateSelection(Vector2i _change)
+void TextPanel::updateSelection(std::vector<Score> _scores, Vector2i _change)
 {
 	Vector2i finalChange = {
 		selection.x + _change.x,
@@ -105,8 +105,15 @@ void TextPanel::updateSelection(Vector2i _change)
 	if (finalChange.x < 0) finalChange.x = 0;
 	if (finalChange.y < 0) finalChange.y = 0;
 
-	if (currentScreen == lbScreen && finalChange.x > 1) return;
-	if (currentScreen == lbScreen && finalChange.y > 7) return;
+	if (currentScreen == lbScreen)
+	{
+		updatePage(_scores, _change.x);
+
+		if (finalChange.y != 8) finalChange.x = 0;
+		if (finalChange.x > 1) return;
+		if (finalChange.y > 7) return;
+		if (replayPage == (int)((_scores.size() - 1) / 8) && finalChange.y > (_scores.size() - 1) - (replayPage * 8)) finalChange.y = (_scores.size() - 1) - (replayPage * 8);
+	}
 	
 	if (currentScreen == helpScreen && finalChange.x > 2) return;
 	if (currentScreen == helpScreen && finalChange.y > 0) return;
@@ -171,7 +178,7 @@ void TextPanel::draw(Vector2i _position)
 	{
 		Vector2f selectionBoxSize = {
 			(float)(topScreen.x) / 3.f,
-			digitSize.y / 2.f
+			halfDigitSize.y
 		};
 		Vector2f selectionBoxPosition = {
 			selectionBoxSize.x * selection.x,

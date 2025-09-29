@@ -14,7 +14,7 @@
 class ReplayManager
 {
 public:
-	ReplayManager(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions, std::string _directory);
+	ReplayManager(C2D_SpriteSheet& _sheet, Difficulty _difficulty, std::string _directory);
 	ReplayPlayer player;
 	ReplayRecorder recorder;
 

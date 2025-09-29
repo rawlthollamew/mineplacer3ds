@@ -11,10 +11,7 @@
 #include "buttons.h"
 #include "timer.h"
 #include "replay_manager.h"
-
-const int tileSize = 20;
-const int mineCount = 50;
-const Vector2i dimentions = { bottomScreen.x / tileSize, bottomScreen.y / tileSize };
+#include "settings.h"
 
 int main(int argc, char* argv[])
 {
@@ -30,13 +27,16 @@ int main(int argc, char* argv[])
 	u32 clrBlack = C2D_Color32f(0.f, 0.f, 0.f, 0.f);
 	C2D_SpriteSheet sheet = C2D_SpriteSheetLoad("romfs:/gfx/textures.t3x");
 	
-	Maps maps(sheet, tileSize, mineCount, dimentions);
+	Settings settings;
+	Difficulty currentDifficulty = settings.diffs[settings.current];
+
+	Maps maps(sheet, currentDifficulty);
 	maps.generate();
 
-	Details details(sheet, mineCount, dimentions, 1);
+	Details details(sheet, currentDifficulty.mineCount, currentDifficulty.dimentions, 1.f);
 	ButtonHandler buttonHandler(sheet, details.getInfoPosition(), details.getInfoPadding(), 0.75f);
 	
-	ReplayManager replays(sheet, tileSize, mineCount, dimentions, "sdmc:/mineplacer/");
+	ReplayManager replays(sheet, currentDifficulty, "sdmc:/mineplacer/");
 	details.textPanel.loadLeaderboardText(replays.scores);
 
 	Timer timer;
@@ -73,17 +73,17 @@ int main(int argc, char* argv[])
 		else if ((kDown & KEY_TOUCH) && !completed)
 		{
 			Vector2i mapPosition = {
-				(int)(touch.px / tileSize),
-				(int)(touch.py / tileSize)
+				(int)(touch.px / currentDifficulty.tileSize),
+				(int)(touch.py / currentDifficulty.tileSize)
 			};
 
 			maps.placeMine(mapPosition);
 			replays.recorder.update(mapPosition);
 		}
-		else if (kDown & KEY_UP) details.textPanel.updateSelection({0, -1});
-		else if (kDown & KEY_DOWN) details.textPanel.updateSelection({0, 1});
-		else if (kDown & KEY_LEFT) details.textPanel.updatePage(replays.scores, -1);
-		else if (kDown & KEY_RIGHT) details.textPanel.updatePage(replays.scores, 1);
+		else if (kDown & KEY_UP) details.textPanel.updateSelection(replays.scores, {0, -1});
+		else if (kDown & KEY_DOWN) details.textPanel.updateSelection(replays.scores, {0, 1});
+		else if (kDown & KEY_LEFT) details.textPanel.updateSelection(replays.scores, {-1, 0});
+		else if (kDown & KEY_RIGHT) details.textPanel.updateSelection(replays.scores, {1, 0});
 		else if (kDown & KEY_L)
 		{
 			buttonHandler.selection -= 1;
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 
 		details.update(
 			(replays.player.playing) ? C2D_Color32f(0.f, 0.f, 1.f, 0.5f) : C2D_Color32f(1.f, 1.f, 1.f, 0.5f),
-			(replays.player.playing) ? mineCount - replays.player.getMinesPlaced() : mineCount - maps.minesPlaced,
+			(replays.player.playing) ? currentDifficulty.mineCount - replays.player.getMinesPlaced() : currentDifficulty.mineCount - maps.minesPlaced,
 			(replays.player.playing) ? replays.player.getTime() : timer.getTime()
 		);
 

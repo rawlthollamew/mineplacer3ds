@@ -1,7 +1,7 @@
 #include "replay_manager.h"
 
-ReplayManager::ReplayManager(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions, std::string _directory)
-	: player(_sheet, _tileSize, _mineCount, _dimentions), directory(_directory)
+ReplayManager::ReplayManager(C2D_SpriteSheet& _sheet, Difficulty _difficulty, std::string _directory)
+	: player(_sheet, _difficulty), directory(_directory)
 {
 	mkdir(_directory.c_str(), 0777);
 	getScores();

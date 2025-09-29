@@ -11,7 +11,7 @@
 class ReplayPlayer
 {
 public:
-	ReplayPlayer(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions);
+	ReplayPlayer(C2D_SpriteSheet& _sheet, Difficulty _difficulty);
 	void start(Score _score);
 	void draw();
 	int getTime();

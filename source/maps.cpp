@@ -1,12 +1,13 @@
 #include "maps.h"
 
-Maps::Maps(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions)
+Maps::Maps(C2D_SpriteSheet& _sheet, Difficulty _difficulty)
 {
-	
 	textBuffer = C2D_TextBufNew(4096);
-	tileSize = _tileSize;
-	mineCount = _mineCount;
-	dimentions = _dimentions;
+	dimentions = _difficulty.dimentions;
+	mineCount = _difficulty.mineCount;
+	scaling = _difficulty.scaling;
+	textSize = _difficulty.textSize;
+	tileSize = _difficulty.tileSize;
 	
 	clearMaps();
 
@@ -101,14 +102,14 @@ void Maps::draw()
 			
 			C2D_SpriteSetCenter(&currentSprite, 0.f, 0.f);
 			C2D_SpriteSetPos(&currentSprite, x * tileSize, y * tileSize);
-			C2D_SpriteSetScale(&currentSprite, 1.f, 1.f);
+			C2D_SpriteSetScale(&currentSprite, scaling, scaling);
 			C2D_DrawSprite(&currentSprite);
 			
 			if (playerMap[y][x])
 			{
 				C2D_SpriteSetCenter(&flagSprite, 0.f, 0.f);
 				C2D_SpriteSetPos(&flagSprite, x * tileSize, y * tileSize);
-				C2D_SpriteSetScale(&flagSprite, 1.f, 1.f);
+				C2D_SpriteSetScale(&flagSprite, scaling, scaling);
 				C2D_DrawSprite(&flagSprite);
 			}
 			
@@ -116,30 +117,23 @@ void Maps::draw()
 			{
 				C2D_SpriteSetCenter(&errorSprite, 0.f, 0.f);
 				C2D_SpriteSetPos(&errorSprite, x * tileSize, y * tileSize);
-				C2D_SpriteSetScale(&errorSprite, 1.f, 1.f);
+				C2D_SpriteSetScale(&errorSprite, scaling, scaling);
 				C2D_DrawSprite(&errorSprite);
 
 			}
 			else if (generatedMap[y][x] > 0)
-			{	
-				if (playerMap[y][x])
-				{
-					Vector2i textPosition = { (int)(x * tileSize + (tileSize * 0.6f)), (int)(y * tileSize + (tileSize * 0.4f)) };
+			{
+				Vector2f textDimentions = { 0.f, 0.f };
+				snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
+				C2D_TextParse(&dynamicText, textBuffer, buf);
+				C2D_TextGetDimensions(&dynamicText, textSize, textSize, &textDimentions.x, &textDimentions.y);
 
-					snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
-					C2D_TextParse(&dynamicText, textBuffer, buf);
-					C2D_TextOptimize(&dynamicText);
-					C2D_DrawText(&dynamicText, C2D_WithColor, textPosition.x, textPosition.y, 0.f, 0.5f, 0.5f, currentTileColor);
-				}
-				else if (!playerMap[y][x])
-				{
-					Vector2i textPosition = { (int)(x * tileSize + (tileSize * 0.25f)), (int)(y * tileSize + (tileSize * 0.1f)) };
-					
-					snprintf(buf, sizeof(buf), "%i", generatedMap[y][x]);
-					C2D_TextParse(&dynamicText, textBuffer, buf);
-					C2D_TextOptimize(&dynamicText);
-					C2D_DrawText(&dynamicText, C2D_WithColor, textPosition.x, textPosition.y, 0.f, 0.75f, 0.75f, currentTileColor);
-				}
+				Vector2f textPosition = {
+					x * tileSize + (textDimentions.x  / 2.f),
+					y * tileSize
+				};
+				C2D_TextOptimize(&dynamicText);
+				C2D_DrawText(&dynamicText, C2D_WithColor | C2D_AlignCenter | C2D_AlignJustified, textPosition.x, textPosition.y, 0.f, textSize, textSize, currentTileColor);
 			}
 			
 			// if (mineMap[y][x]) C2D_DrawRectSolid(x * tileSize, y * tileSize, 0, tileSize, tileSize, C2D_Color32f(0.f,1.f,1.f,0.5f));

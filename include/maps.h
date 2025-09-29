@@ -21,7 +21,7 @@ enum TileColors
 class Maps
 {
 public:
-	Maps(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions);
+	Maps(C2D_SpriteSheet& _sheet, Difficulty _difficulty);
 
 	int minesPlaced = 0;
 
@@ -37,8 +37,10 @@ public:
 	std::vector<std::vector<bool>> mineMap;
 	std::vector<std::vector<bool>> playerMap;
 private:
-	int tileSize;
 	int mineCount;
+	int tileSize;
+	float scaling;
+	float textSize;
 	Vector2i dimentions;
 
 	C2D_TextBuf textBuffer;

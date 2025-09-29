@@ -1,10 +1,10 @@
 #include "replay_player.h"
 
-ReplayPlayer::ReplayPlayer(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCount, Vector2i _dimentions)
-	: replayMap(_sheet, _tileSize, _mineCount, _dimentions)
+ReplayPlayer::ReplayPlayer(C2D_SpriteSheet& _sheet, Difficulty _difficulty)
+	: replayMap(_sheet, _difficulty)
 {
 	score = Score{"", 0, {}, {}};
-	dimentions = _dimentions;
+	dimentions = _difficulty.dimentions;
 	replayMap.clearMaps();
 	
 	finished = false;
@@ -14,7 +14,7 @@ ReplayPlayer::ReplayPlayer(C2D_SpriteSheet& _sheet, int _tileSize, int _mineCoun
 	elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
 	movesDone = 0;
 	minesPlaced = 0;
-	minesCount = _mineCount;
+	minesCount = _difficulty.mineCount;
 }
 
 void ReplayPlayer::start(Score _score)

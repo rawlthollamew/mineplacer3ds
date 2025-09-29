@@ -54,3 +54,12 @@ struct Score
 	std::vector<Move> moves;
 	std::vector<std::vector<bool>> mineMap;
 };
+
+struct Difficulty
+{
+	float textSize;
+	int tileSize;
+	int mineCount;
+	Vector2i dimentions;
+	float scaling;
+};
