@@ -21,9 +21,10 @@ TextPanel::TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigi
 		"        Fill the grid so that the tiles are perfectly even.\n"
 		"        Hint: start from the outside and work your way in.\n\n"
 		"Controls: \n"
-		"        L / R: Change button selection (bottom right of top screen)\n"
-		"        : Select current button (defaulted to new game)\n"
-		"        : Enter replay mode\n"
+		"        L / R: Change main selection (bottom right of top screen)\n"
+		"        : Change sub selection (center of top screen)\n"
+		"        : Select main current selection (defaulted to new game)\n"
+		"        : Select sub current selection (defaulted to easy)\n"
 		"        Press START anytime to quit the game.";
 
 	lbString =
@@ -113,7 +114,7 @@ void TextPanel::updateSelection(std::vector<Score> _scores, Vector2i _change)
 	{
 		updatePage(_scores, _change.x);
 
-		if (finalChange.y != 8) finalChange.x = 0;
+		finalChange.x = 0;
 		if (finalChange.x > 1) return;
 		if (finalChange.y > 7) return;
 		// means that out of bounds not allowed.
@@ -126,7 +127,7 @@ void TextPanel::updateSelection(std::vector<Score> _scores, Vector2i _change)
 	selection = finalChange;
 }
 
-void TextPanel::draw(Vector2i _position)
+void TextPanel::draw(Vector2i _position, int _difficultyIndex)
 {
 	C2D_DrawText(
 		&mainText,
@@ -142,7 +143,7 @@ void TextPanel::draw(Vector2i _position)
 	if (currentScreen == lbScreen)
 	{
 		Vector2f selectionBoxSize = {
-			(float)(topScreen.x) - halfDigitSize.x,
+			(float)(topScreen.x),
 			halfDigitSize.y
 		};
 		Vector2f selectionBoxPosition = {
@@ -181,39 +182,8 @@ void TextPanel::draw(Vector2i _position)
 	}
 	else if (currentScreen == helpScreen)
 	{
-		C2D_DrawText(
-			&easyDiffText,
-			C2D_WithColor,
-			topScreen.x / 6.f,
-			topScreen.y - (digitSize.y * 2),
-			0,
-			0.5f,
-			0.5f,
-			C2D_Color32f(1.f,1.f,1.f,1.f)
-		);
-		C2D_DrawText(
-			&mediumDiffText,
-			C2D_WithColor | C2D_AlignCenter,
-			topScreen.x / 2.f,
-			topScreen.y - (digitSize.y * 2),
-			0,
-			0.5f,
-			0.5f,
-			C2D_Color32f(1.f,1.f,1.f,1.f)
-		);
-		C2D_DrawText(
-			&hardDiffText,
-			C2D_WithColor | C2D_AlignRight,
-			topScreen.x - (topScreen.x / 6.f),
-			topScreen.y - (digitSize.y * 2),
-			0,
-			0.5f,
-			0.5f,
-			C2D_Color32f(1.f,1.f,1.f,1.f)
-		);
-
 		Vector2f selectionBoxSize = {
-			(float)(topScreen.x / 3.f) - selectionTopLeft.image.subtex->width,
+			(float)(topScreen.x / 3.f),
 			halfDigitSize.y
 		};
 		Vector2f selectionBoxPosition = {
@@ -235,19 +205,58 @@ void TextPanel::draw(Vector2i _position)
 		
 		C2D_SpriteSetPos(
 			&selectionTopRight,
-			selectionBoxPosition.x + selectionBoxSize.x,
+			selectionBoxPosition.x + selectionBoxSize.x - selectionTopRight.image.subtex->width,
 			selectionBoxPosition.y
 		);
 		
 		C2D_SpriteSetPos(
 			&selectionBottomRight,
-			selectionBoxPosition.x + selectionBoxSize.x,
+			selectionBoxPosition.x + selectionBoxSize.x - selectionBottomRight.image.subtex->width,
 			selectionBoxPosition.y + selectionBoxSize.y
 		);
-
+		C2D_DrawRectSolid(
+			selectionBoxSize.x * _difficultyIndex,
+			selectionBoxPosition.y,
+			0,
+			selectionBoxSize.x,
+			selectionBoxSize.y + selectionTopLeft.image.subtex->width,
+			C2D_Color32f(0.f,1.f,1.f,0.5f)
+		);
+		
 		C2D_DrawSprite(&selectionTopLeft);
 		C2D_DrawSprite(&selectionBottomLeft);
 		C2D_DrawSprite(&selectionTopRight);
 		C2D_DrawSprite(&selectionBottomRight);
+		
+		C2D_DrawText(
+			&easyDiffText,
+			C2D_WithColor | C2D_AlignCenter,
+			topScreen.x / 6.f,
+			topScreen.y - (digitSize.y * 2),
+			0,
+			0.5f,
+			0.5f,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
+		C2D_DrawText(
+			&mediumDiffText,
+			C2D_WithColor | C2D_AlignCenter,
+			topScreen.x / 2.f,
+			topScreen.y - (digitSize.y * 2),
+			0,
+			0.5f,
+			0.5f,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
+		C2D_DrawText(
+			&hardDiffText,
+			C2D_WithColor | C2D_AlignCenter,
+			topScreen.x - (topScreen.x / 6.f),
+			topScreen.y - (digitSize.y * 2),
+			0,
+			0.5f,
+			0.5f,
+			C2D_Color32f(1.f,1.f,1.f,1.f)
+		);
 	}
 }

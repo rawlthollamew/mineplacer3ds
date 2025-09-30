@@ -23,7 +23,7 @@ public:
 	int replayPage = 0;
 	void updatePage(std::vector<Score> _scores, int _change);
 	void loadLeaderboardText(std::vector<Score> _scores);
-	void draw(Vector2i _position);
+	void draw(Vector2i _position, int _difficultyIndex);
 	void updateSelection(std::vector<Score> _scores, Vector2i _change);
 private:
 	C2D_TextBuf mainBuf;

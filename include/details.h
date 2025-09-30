@@ -21,7 +21,7 @@ public:
 	bool replayMode;
 
 	void update(u32 _color, int _minesPlaced, int _currentTime);
-	void draw();
+	void draw(int _difficultyIndex);
 
 	TextPanel textPanel;
 	Vector2i getInfoPosition() { return infoPosition; }

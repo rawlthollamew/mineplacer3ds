@@ -35,7 +35,7 @@ class ButtonHandler
 public:
 	int buttonCount = 2;
 	int selection = 0;
-	bool helpText = false;
+	bool helpText = true;
 
 	C2D_Sprite selectionTopLeft;
 	C2D_Sprite selectionBottomLeft;

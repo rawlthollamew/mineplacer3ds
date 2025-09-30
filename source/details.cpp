@@ -42,14 +42,14 @@ Details::~Details()
 void Details::initReplayText(int _finalTime, std::string _name)
 {
 	std::string replayString =
-		"You are currently in replay mode. Press B to exit replay mode. \n"
+		"You are currently in replay mode. Press  to exit replay mode. \n"
 		"    Time: " + std::to_string(_finalTime) + "    Player: " + _name;
 
 	C2D_TextParse(&replayText, replayBuf, replayString.c_str());
 	C2D_TextOptimize(&replayText);
 }
 
-void Details::draw()
+void Details::draw(int _difficultyIndex)
 {
 	C2D_DrawRectSolid(
 		infoPosition.x,
@@ -60,7 +60,7 @@ void Details::draw()
 		infoColor
 	);
 
-	textPanel.draw({infoPadding, infoPadding});
+	textPanel.draw({infoPadding, infoPadding}, _difficultyIndex);
 	mines.draw();
 	times.draw();
 
