@@ -12,10 +12,10 @@ class Button
 {
 public:
 	Button();
-	Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _text, float _textSize);
+	Button(Vector2f _position, C2D_Sprite _sprite, u32 _color, std::string _text, float _textSize);
 	
 	u32 color;
-	Vector2i position;
+	Vector2f position;
 	Vector2f size;
 	float textSize;
 	float textHeight;
@@ -37,17 +37,14 @@ public:
 	int selection = 0;
 	bool helpText = true;
 
-	C2D_Sprite selectionTopLeft;
-	C2D_Sprite selectionBottomLeft;
-	C2D_Sprite selectionTopRight;
-	C2D_Sprite selectionBottomRight;
+	C2D_Sprite selectionSprite;
 
-	ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding, float _textSize);
+	ButtonHandler(C2D_SpriteSheet _sheet, Vector2f _drawPosition, int _padding, float _textSize);
 	void draw();
 	void setVector();
 private:
 	int padding;
-	Vector2i drawPosition;
+	Vector2f drawPosition;
 
 	Button newGameButton;
 	Button helpButton;

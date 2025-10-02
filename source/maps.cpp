@@ -60,7 +60,8 @@ void Maps::initGeneratedMap()
 
 void Maps::generate()
 {
-	srand(time(0));
+	auto seedTime = std::chrono::high_resolution_clock::now();
+	srand(seedTime.time_since_epoch().count());
 	minesPlaced = 0;
 	clearMaps();
 

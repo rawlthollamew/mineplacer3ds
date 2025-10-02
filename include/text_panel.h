@@ -39,10 +39,7 @@ private:
 	Vector2f halfDigitSize;
 	Vector2f digitSize;
 	
-	C2D_Sprite selectionTopLeft;
-	C2D_Sprite selectionTopRight;
-	C2D_Sprite selectionBottomLeft;
-	C2D_Sprite selectionBottomRight;
+	C2D_Sprite selectionSprite;
 
 	std::string helpString;
 	std::string lbString;

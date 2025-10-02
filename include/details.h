@@ -24,7 +24,7 @@ public:
 	void draw(int _difficultyIndex);
 
 	TextPanel textPanel;
-	Vector2i getInfoPosition() { return infoPosition; }
+	Vector2f getInfoPosition() { return infoPosition; }
 	int getInfoPadding() { return infoPadding; }
 	void initReplayText(int _finalTime, std::string _name);
 private:
@@ -36,7 +36,7 @@ private:
 	CounterDisplay times;
 	C2D_Sprite timeSprite;
 
-	Vector2i infoPosition;
+	Vector2f infoPosition;
 	Vector2i infoSize;
 
 	C2D_Text replayText;

@@ -22,9 +22,8 @@ TextPanel::TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigi
 		"        Hint: start from the outside and work your way in.\n\n"
 		"Controls: \n"
 		"        L / R: Change main selection (bottom right of top screen)\n"
-		"        : Change sub selection (center of top screen)\n"
-		"        : Select main current selection (defaulted to new game)\n"
-		"        : Select sub current selection (defaulted to easy)\n"
+		"        : Change difficulty (center of top screen)\n"
+		"        : Select main selection (defaulted to new game)\n"
 		"        Press START anytime to quit the game.";
 
 	lbString =
@@ -48,10 +47,7 @@ TextPanel::TextPanel(float _textSize, C2D_SpriteSheet _sheet, Vector2f _halfDigi
 	setText();
 
 	selection = { 0, 0 };
-	C2D_SpriteFromSheet(&selectionTopLeft, _sheet, selectionTopLeftPng);
-	C2D_SpriteFromSheet(&selectionTopRight, _sheet, selectionTopRightPng);
-	C2D_SpriteFromSheet(&selectionBottomLeft, _sheet, selectionBottomLeftPng);
-	C2D_SpriteFromSheet(&selectionBottomRight, _sheet, selectionBottomRightPng);
+	C2D_SpriteFromSheet(&selectionSprite, _sheet, selectionPng);
 }
 
 void TextPanel::updatePage(std::vector<Score> _scores, int _change)
@@ -114,8 +110,6 @@ void TextPanel::updateSelection(std::vector<Score> _scores, Vector2i _change)
 	{
 		updatePage(_scores, _change.x);
 
-		finalChange.x = 0;
-		if (finalChange.x > 1) return;
 		if (finalChange.y > 7) return;
 		// means that out of bounds not allowed.
 		if (replayPage == (int)((_scores.size() - 1) / 8) && finalChange.y > ((int)_scores.size() - 1) - (replayPage * 8)) finalChange.y = ((int)_scores.size() - 1) - (replayPage * 8);
@@ -143,42 +137,15 @@ void TextPanel::draw(Vector2i _position, int _difficultyIndex)
 	if (currentScreen == lbScreen)
 	{
 		Vector2f selectionBoxSize = {
-			(float)(topScreen.x),
+			(float)(topScreen.x) - selectionSprite.image.subtex->width,
 			halfDigitSize.y
 		};
 		Vector2f selectionBoxPosition = {
-			selection.x * (selectionBoxSize.x / 2.f),
+			0,
 			halfDigitSize.y * (selection.y + 5) + _position.y
 		};
 
-		C2D_SpriteSetPos(
-			&selectionTopLeft,
-			selectionBoxPosition.x,
-			selectionBoxPosition.y
-		);
-
-		C2D_SpriteSetPos(
-			&selectionBottomLeft,
-			selectionBoxPosition.x,
-			selectionBoxPosition.y + selectionBoxSize.y
-		);
-
-		C2D_SpriteSetPos(
-			&selectionTopRight,
-			selectionBoxPosition.x + selectionBoxSize.x,
-			selectionBoxPosition.y
-		);
-
-		C2D_SpriteSetPos(
-			&selectionBottomRight,
-			selectionBoxPosition.x + selectionBoxSize.x,
-			selectionBoxPosition.y + selectionBoxSize.y
-		);
-
-		C2D_DrawSprite(&selectionTopLeft);
-		C2D_DrawSprite(&selectionBottomLeft);
-		C2D_DrawSprite(&selectionTopRight);
-		C2D_DrawSprite(&selectionBottomRight);
+		DrawSelection(selectionSprite, selectionBoxPosition, selectionBoxSize);
 	}
 	else if (currentScreen == helpScreen)
 	{
@@ -190,43 +157,26 @@ void TextPanel::draw(Vector2i _position, int _difficultyIndex)
 			selectionBoxSize.x * selection.x,
 			topScreen.y - (digitSize.y * 2.f)
 		};
+		DrawSelection(selectionSprite, selectionBoxPosition, selectionBoxSize);
 		
-		C2D_SpriteSetPos(
-			&selectionTopLeft,
-			selectionBoxPosition.x,
-			selectionBoxPosition.y
-		);
-		
-		C2D_SpriteSetPos(
-			&selectionBottomLeft,
-			selectionBoxPosition.x,
-			selectionBoxPosition.y + selectionBoxSize.y
-		);
-		
-		C2D_SpriteSetPos(
-			&selectionTopRight,
-			selectionBoxPosition.x + selectionBoxSize.x - selectionTopRight.image.subtex->width,
-			selectionBoxPosition.y
-		);
-		
-		C2D_SpriteSetPos(
-			&selectionBottomRight,
-			selectionBoxPosition.x + selectionBoxSize.x - selectionBottomRight.image.subtex->width,
-			selectionBoxPosition.y + selectionBoxSize.y
-		);
+		// highlight colors for the user to distinguish
 		C2D_DrawRectSolid(
 			selectionBoxSize.x * _difficultyIndex,
 			selectionBoxPosition.y,
 			0,
 			selectionBoxSize.x,
-			selectionBoxSize.y + selectionTopLeft.image.subtex->width,
+			selectionBoxSize.y,
 			C2D_Color32f(0.f,1.f,1.f,0.5f)
 		);
 		
-		C2D_DrawSprite(&selectionTopLeft);
-		C2D_DrawSprite(&selectionBottomLeft);
-		C2D_DrawSprite(&selectionTopRight);
-		C2D_DrawSprite(&selectionBottomRight);
+		C2D_DrawRectSolid(
+			selectionBoxSize.x * selection.x,
+			selectionBoxPosition.y,
+			0,
+			selectionBoxSize.x,
+			selectionBoxSize.y,
+			C2D_Color32f(1.f,1.f,1.f,0.25f)
+		);
 		
 		C2D_DrawText(
 			&easyDiffText,

@@ -138,7 +138,7 @@ void ReplayManager::getScores(Difficulty _difficulty)
 			
 			json_error_t error;
 			json_t* root = json_load_file(path.c_str(), 0, &error);
-			if (!root) return ;
+			if (!root) return;
 
 			Score newScore;
 			newScore.username = json_string_value(json_object_get(root, "username"));

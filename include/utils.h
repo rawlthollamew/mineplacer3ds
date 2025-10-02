@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdio.h>
 #include <3ds.h>
 #include <citro2d.h>
 #include <string>
@@ -18,10 +17,7 @@ enum PngOrder
 	newGamePng,
 	helpPng,
 	lbPng,
-	selectionTopLeftPng,
-	selectionBottomLeftPng,
-	selectionTopRightPng,
-	selectionBottomRightPng,
+	selectionPng,
 	configPng
 };
 
@@ -72,3 +68,19 @@ struct Score
 	Difficulty difficulty;
 	std::vector<std::vector<bool>> mineMap;
 };
+
+inline void DrawSelection(C2D_Sprite _selection, Vector2f _position, Vector2f _size)
+{
+	C2D_SpriteSetRotationDegrees(&_selection, 0.f);
+	C2D_SpriteSetPos(&_selection, _position.x, _position.y);
+	C2D_DrawSprite(&_selection);
+	C2D_SpriteSetRotationDegrees(&_selection, 90.f);
+	C2D_SpriteSetPos(&_selection, _position.x + _size.x, _position.y);
+	C2D_DrawSprite(&_selection);
+	C2D_SpriteSetRotationDegrees(&_selection, 180.f);
+	C2D_SpriteSetPos(&_selection, _position.x + _size.x, _position.y + _size.y);
+	C2D_DrawSprite(&_selection);
+	C2D_SpriteSetRotationDegrees(&_selection, 270.f);
+	C2D_SpriteSetPos(&_selection, _position.x, _position.y + _size.y);
+	C2D_DrawSprite(&_selection);
+}

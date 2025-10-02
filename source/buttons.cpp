@@ -6,7 +6,7 @@ Button::Button()
 	color = 0;
 }
 
-Button::Button(Vector2i _position, C2D_Sprite _sprite, u32 _color, std::string _text, float _textSize)
+Button::Button(Vector2f _position, C2D_Sprite _sprite, u32 _color, std::string _text, float _textSize)
 {
 	position = _position;
 	sprite = _sprite;
@@ -65,17 +65,14 @@ void Button::draw()
 	);
 }
 
-ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2i _drawPosition, int _padding, float _textSize)
+ButtonHandler::ButtonHandler(C2D_SpriteSheet _sheet, Vector2f _drawPosition, int _padding, float _textSize)
 {
 	drawPosition = _drawPosition;
 	padding = _padding;
 	
 	u32 backgroundColor = C2D_Color32f(1.f,1.f,1.f,0.5f);
 
-	C2D_SpriteFromSheet(&selectionTopLeft, _sheet, selectionTopLeftPng);
-	C2D_SpriteFromSheet(&selectionBottomLeft, _sheet, selectionBottomLeftPng);
-	C2D_SpriteFromSheet(&selectionTopRight, _sheet, selectionTopRightPng);
-	C2D_SpriteFromSheet(&selectionBottomRight, _sheet, selectionBottomRightPng);
+	C2D_SpriteFromSheet(&selectionSprite, _sheet, selectionPng);
 
 	// adding buttons
 	C2D_Sprite currentSprite;
@@ -130,33 +127,7 @@ void ButtonHandler::draw()
 		
 		if (i == selection)
 		{
-			C2D_SpriteSetPos(
-				&selectionTopLeft,
-				activeButtons[i].position.x,
-				activeButtons[i].position.y
-			);
-			C2D_DrawSprite(&selectionTopLeft);
-
-			C2D_SpriteSetPos(
-				&selectionBottomLeft,
-				activeButtons[i].position.x,
-				activeButtons[i].position.y + activeButtons[i].size.y - selectionBottomLeft.image.subtex->height
-			);
-			C2D_DrawSprite(&selectionBottomLeft);
-
-			C2D_SpriteSetPos(
-				&selectionTopRight,
-				activeButtons[i].position.x + activeButtons[i].size.x - selectionTopRight.image.subtex->width,
-				activeButtons[i].position.y
-			);
-			C2D_DrawSprite(&selectionTopRight);
-
-			C2D_SpriteSetPos(
-				&selectionBottomRight,
-				activeButtons[i].position.x + activeButtons[i].size.x - selectionBottomRight.image.subtex->width,
-				activeButtons[i].position.y + activeButtons[i].size.y - selectionBottomRight.image.subtex->height
-			);
-			C2D_DrawSprite(&selectionBottomRight);
+			DrawSelection(selectionSprite, activeButtons[i].position, activeButtons[i].size);
 		}
 
 		currentOffset += activeButtons[i].size.x + padding;
